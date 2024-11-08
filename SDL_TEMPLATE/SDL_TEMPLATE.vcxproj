@@ -27,7 +27,9 @@
     <ClCompile Include="GameSound.cpp" />
     <ClCompile Include="Heart.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PoopBar.cpp" />
     <ClCompile Include="Text.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -41,7 +43,9 @@
     <ClInclude Include="GameImage.h" />
     <ClInclude Include="GameSound.h" />
     <ClInclude Include="Heart.h" />
+    <ClInclude Include="PoopBar.h" />
     <ClInclude Include="Text.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

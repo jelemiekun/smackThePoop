@@ -5,6 +5,8 @@
 #include "Heart.h"
 #include "Character.h"
 #include "Text.h"
+#include "Timer.h"
+#include "PoopBar.h"
 
 #include "App_Info.h"
 
@@ -27,8 +29,10 @@ private:
 	Character* character;
 	bool isPlaying;
 	TTF_Font* gFont;
+	Timer* timer;
 	Text* textTimer;
 	SDL_Rect* timerRect;
+	PoopBar* poopBar;
 	
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/

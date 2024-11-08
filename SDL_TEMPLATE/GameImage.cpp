@@ -28,14 +28,15 @@ void GameImage::loadFromFile(SDL_Renderer* renderer, const char* path) {
 	SDL_FreeSurface(newSurface);
 }
 
-void GameImage::render(SDL_Renderer* renderer, SDL_Rect* dstRect) {
+void GameImage::render(SDL_Renderer* renderer, SDL_Rect* dstRect) const {
 	SDL_RenderCopy(renderer, mTexture, srcRect, dstRect);
 }
 
-SDL_Rect* GameImage::getSrcRect() {
+SDL_Rect* GameImage::getSrcRect() const {
 	return srcRect;
 }
 
-void GameImage::close() {
+void GameImage::close() const {
 	SDL_DestroyTexture(mTexture);
+	delete srcRect;
 }

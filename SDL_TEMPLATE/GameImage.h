@@ -15,9 +15,9 @@ public:
 
 	void loadFromFile(SDL_Renderer* renderer, const char* path);
 
-	void render(SDL_Renderer* renderer, SDL_Rect* dstRect);
+	void render(SDL_Renderer* renderer, SDL_Rect* dstRect) const;
 
-	void close();
+	SDL_Rect* getSrcRect() const;
 
-	SDL_Rect* getSrcRect();
+	void close() const;
 };

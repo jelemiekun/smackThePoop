@@ -6,7 +6,8 @@ Game::Game() : gWindow(nullptr), running(false),
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
 				imgHeart3(nullptr),
 				controller1(nullptr), gameSounds(nullptr), isPlaying(false),
-				character(nullptr), gFont(nullptr), textTimer(nullptr) {}
+				character(nullptr), gFont(nullptr), textTimer(nullptr),
+				timer(nullptr), poopBar(nullptr) {}
 
 Game::~Game() {}
 
@@ -74,16 +75,25 @@ void Game::init() {
 	gameSounds->loadMusic();
 	gameSounds->loadSoundFX();
 
+	timer = new Timer;
+	timer->setStartingTime(20000);
+	timer->startTimer();
+
 	textTimer = new Text;
 	textTimer->setGFont(gFont);
 
 	constexpr int TIMER_RECT_X_ALLOWANCE = 20;
+	constexpr int TIMER_RECT_Y_ALLOWANCE = 8;
 	constexpr int timerRectWidth = 110;
 	timerRect = new SDL_Rect;
 	timerRect->x = SCREEN_WIDTH - timerRectWidth - TIMER_RECT_X_ALLOWANCE;
-	timerRect->y = 15;
+	timerRect->y = TIMER_RECT_Y_ALLOWANCE;
 	timerRect->w = timerRectWidth;
 	timerRect->h = 50;
+
+	poopBar = new PoopBar;
+	poopBar->init(gRenderer);
+	poopBar->setXY(150, 10);
 
 	gameSounds->playMusic();
 	
@@ -141,7 +151,9 @@ void Game::render() {
 	character->animate(gRenderer, &rectCharacter);
 
 	SDL_Color black = { 0, 0, 0, 255 };
-	textTimer->loadFromRenderedText(gRenderer, std::to_string(texts), black, timerRect );
+	textTimer->loadFromRenderedText(gRenderer, timer->getTimeInFormat(), black, timerRect );
+
+	poopBar->render(gRenderer);
 
 	texts++;
 
