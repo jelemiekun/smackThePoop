@@ -2,7 +2,8 @@
 #include <iostream>
 
 Game::Game() : gWindow(nullptr), gRenderer(nullptr), running(false), 
-				imgBackground(nullptr), imgHeart(nullptr),
+				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
+				imgHeart3(nullptr),
 				controller1(nullptr), gameSounds(nullptr) {}
 
 Game::~Game() {}
@@ -34,8 +35,19 @@ void Game::init() {
 	imgBackground = new GameImage;
 	imgBackground->loadFromFile(gRenderer, "assets/img/background.png");
 
-	imgHeart = new GameImage;
-	imgHeart->loadFromFile(gRenderer, "assets/img/heart.png");
+	imgHeart1 = new Heart;
+	imgHeart1->loadFromFile(gRenderer, "assets/img/heart.png");
+	imgHeart1->getSrcRect()->w = imgHeart1->getSrcRect()->w / 2;
+
+	imgHeart2 = new Heart;
+	imgHeart2->loadFromFile(gRenderer, "assets/img/heart.png");
+	imgHeart2->getSrcRect()->w = imgHeart2->getSrcRect()->w / 2;
+
+	imgHeart3 = new Heart;
+	imgHeart3->loadFromFile(gRenderer, "assets/img/heart.png");
+	imgHeart3->getSrcRect()->w = imgHeart3->getSrcRect()->w / 2;
+
+	heartStates = { 1, 1, 1 };
 
 	controller1 = new GameController;
 	controller1->init();
@@ -45,6 +57,7 @@ void Game::init() {
 	gameSounds->loadMusic();
 	gameSounds->loadSoundFX();
 
+	gameSounds->playMusic();
 	
 
 	running = true;
@@ -72,10 +85,26 @@ void Game::render() {
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(gRenderer);
 
-	SDL_Rect heart = { 0, 0, imgHeart->getSrcRect()->w / 7, imgHeart->getSrcRect()->h / 7};
+	constexpr int HEART_X_ALLOWANCE = 20;
+	constexpr int HEART_Y_ALLOWANCE = 15;
+	constexpr int HEART_GAP = 3;
+
+	SDL_Rect heart1 = { 0 + HEART_X_ALLOWANCE, HEART_Y_ALLOWANCE, 
+		imgHeart1->getSrcRect()->w / 7, imgHeart1->getSrcRect()->h / 7};
+
+	SDL_Rect heart2 = { (imgHeart2->getSrcRect()->w / 7, 
+		imgHeart2->getSrcRect()->h / 7) + HEART_X_ALLOWANCE + (HEART_GAP * 1), HEART_Y_ALLOWANCE, 
+		imgHeart2->getSrcRect()->w / 7, imgHeart2->getSrcRect()->h / 7 };
+
+	SDL_Rect heart3 = { (imgHeart2->getSrcRect()->w / 7, 
+		imgHeart2->getSrcRect()->h / 7) * 2 + HEART_X_ALLOWANCE + (HEART_GAP * 2), HEART_Y_ALLOWANCE,
+		imgHeart3->getSrcRect()->w / 7, imgHeart3->getSrcRect()->h / 7 };
+
 
 	imgBackground->render(gRenderer, nullptr);
-	imgHeart->render(gRenderer, &heart);
+	imgHeart1->render(gRenderer, &heart1, heartStates.heart1);
+	imgHeart2->render(gRenderer, &heart2, heartStates.heart2);
+	imgHeart3->render(gRenderer, &heart3, heartStates.heart3);
 
 	SDL_RenderPresent(gRenderer);
 }

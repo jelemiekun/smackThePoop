@@ -75,6 +75,42 @@ void GameSound::loadSoundFX() {
 		std::cout << "FX fart loaded." << '\n';
 }
 
+void GameSound::playMusic() {
+	Mix_FadeInMusic(gMusic, -1, 5000);
+}
+
+void GameSound::setSoundFX(Uint8 state) {
+	FXState.fx = { state };
+}
+
+void GameSound::playSoundFX() {
+	switch (FXState.fx) {
+	case 0:
+		Mix_PlayChannel(-1, gFXRelief, 0);
+		break;
+	case 1:
+		Mix_PlayChannel(-1, gFXGrunt, 0);
+		break;
+	case 2:
+		Mix_PlayChannel(-1, gFXHitPlayer, 0);
+		break;
+	case 3:
+		Mix_PlayChannel(-1, gFXHitPoop, 0);
+		break;
+	case 4:
+		Mix_PlayChannel(-1, gFXPoopStart, 0);
+		break;
+	case 5:
+		Mix_PlayChannel(-1, gFXPoopEnd, 0);
+		break;
+	case 6:
+		Mix_PlayChannel(-1, gFXFart, 0);
+		break;
+	default:
+		break;
+	}
+}
+
 void GameSound::close() {
 	Mix_FreeChunk(gFXRelief);
 	Mix_FreeChunk(gFXGrunt);

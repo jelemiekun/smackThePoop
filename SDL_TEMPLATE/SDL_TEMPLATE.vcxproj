@@ -24,6 +24,7 @@
     <ClCompile Include="GameFPS.cpp" />
     <ClCompile Include="GameImage.cpp" />
     <ClCompile Include="GameSound.cpp" />
+    <ClCompile Include="Heart.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +37,7 @@
     <ClInclude Include="GameFPS.h" />
     <ClInclude Include="GameImage.h" />
     <ClInclude Include="GameSound.h" />
+    <ClInclude Include="Heart.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -2,8 +2,15 @@
 #include "GameController.h"
 #include "GameSound.h"
 #include "GameImage.h"
+#include "Heart.h"
 
 #include "App_Info.h"
+
+struct HeartStates {
+	unsigned int heart1 : 1;
+	unsigned int heart2 : 1;
+	unsigned int heart3 : 1;
+};
 
 class Game {
 private:
@@ -11,7 +18,10 @@ private:
 	SDL_Renderer* gRenderer;
 
 	GameImage* imgBackground;
-	GameImage* imgHeart;
+	Heart* imgHeart1;
+	Heart* imgHeart2;
+	Heart* imgHeart3;
+	HeartStates heartStates;
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/
 

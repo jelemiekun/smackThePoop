@@ -4,7 +4,7 @@
 #include <iostream>
 
 class GameImage {
-private:
+public:
 	SDL_Texture* mTexture;
 	SDL_Rect* srcRect;
 
@@ -13,6 +13,7 @@ public:
 	~GameImage();
 
 	void loadFromFile(SDL_Renderer* renderer, const char* path);
+
 
 	void render(SDL_Renderer* renderer, SDL_Rect* dstRect);
 
