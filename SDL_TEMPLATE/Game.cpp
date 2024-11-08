@@ -77,6 +77,14 @@ void Game::init() {
 	textTimer = new Text;
 	textTimer->setGFont(gFont);
 
+	constexpr int TIMER_RECT_X_ALLOWANCE = 20;
+	constexpr int timerRectWidth = 110;
+	timerRect = new SDL_Rect;
+	timerRect->x = SCREEN_WIDTH - timerRectWidth - TIMER_RECT_X_ALLOWANCE;
+	timerRect->y = 15;
+	timerRect->w = timerRectWidth;
+	timerRect->h = 50;
+
 	gameSounds->playMusic();
 	
 
@@ -133,7 +141,8 @@ void Game::render() {
 	character->animate(gRenderer, &rectCharacter);
 
 	SDL_Color black = { 0, 0, 0, 255 };
-	textTimer->loadFromRenderedText(gRenderer, std::to_string(texts), black, nullptr );
+	textTimer->loadFromRenderedText(gRenderer, std::to_string(texts), black, timerRect );
+
 	texts++;
 
 	SDL_RenderPresent(gRenderer);

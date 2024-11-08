@@ -28,6 +28,7 @@ private:
 	bool isPlaying;
 	TTF_Font* gFont;
 	Text* textTimer;
+	SDL_Rect* timerRect;
 	
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/
