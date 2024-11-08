@@ -35,3 +35,7 @@ void GameImage::render(SDL_Renderer* renderer, SDL_Rect* dstRect) {
 SDL_Rect* GameImage::getSrcRect() {
 	return srcRect;
 }
+
+void GameImage::close() {
+	SDL_DestroyTexture(mTexture);
+}

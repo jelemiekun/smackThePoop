@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameFPS.cpp" />
@@ -26,18 +27,21 @@
     <ClCompile Include="GameSound.cpp" />
     <ClCompile Include="Heart.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App_Info.h" />
+    <ClInclude Include="Character.h" />
     <ClInclude Include="GameController.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameFPS.h" />
     <ClInclude Include="GameImage.h" />
     <ClInclude Include="GameSound.h" />
     <ClInclude Include="Heart.h" />
+    <ClInclude Include="Text.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

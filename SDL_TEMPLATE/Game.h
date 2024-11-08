@@ -3,6 +3,8 @@
 #include "GameSound.h"
 #include "GameImage.h"
 #include "Heart.h"
+#include "Character.h"
+#include "Text.h"
 
 #include "App_Info.h"
 
@@ -22,6 +24,11 @@ private:
 	Heart* imgHeart2;
 	Heart* imgHeart3;
 	HeartStates heartStates;
+	Character* character;
+	bool isPlaying;
+	TTF_Font* gFont;
+	Text* textTimer;
+	
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/
 

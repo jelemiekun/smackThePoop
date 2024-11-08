@@ -1,10 +1,12 @@
 #include "Game.h"
 #include <iostream>
+#include <string>
 
-Game::Game() : gWindow(nullptr), gRenderer(nullptr), running(false), 
+Game::Game() : gWindow(nullptr), running(false), 
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
 				imgHeart3(nullptr),
-				controller1(nullptr), gameSounds(nullptr) {}
+				controller1(nullptr), gameSounds(nullptr), isPlaying(false),
+				character(nullptr), gFont(nullptr), textTimer(nullptr) {}
 
 Game::~Game() {}
 
@@ -30,7 +32,18 @@ void Game::init() {
 	if (gRenderer == nullptr)
 		std::cout << "Failed to create renderer: " << SDL_GetError() << '\n';
 	else
-		std::cout << "Renderer created";
+		std::cout << "Renderer created" << '\n';
+
+	if (TTF_Init() == -1)
+		std::cout << "SDL_TTF could not initialize: " << TTF_GetError() << '\n';
+	else
+		std::cout << "SDL_TTF initialized." << '\n';
+
+	gFont = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE);
+	if (gFont == nullptr)
+		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
+	else
+		std::cout << "Font yubold loaded." << '\n';
 
 	imgBackground = new GameImage;
 	imgBackground->loadFromFile(gRenderer, "assets/img/background.png");
@@ -47,6 +60,10 @@ void Game::init() {
 	imgHeart3->loadFromFile(gRenderer, "assets/img/heart.png");
 	imgHeart3->getSrcRect()->w = imgHeart3->getSrcRect()->w / 2;
 
+	character = new Character;
+	character->loadFromFile(gRenderer, "assets/img/player.png");
+	character->init();
+
 	heartStates = { 1, 1, 1 };
 
 	controller1 = new GameController;
@@ -56,6 +73,9 @@ void Game::init() {
 	gameSounds->initMixer();
 	gameSounds->loadMusic();
 	gameSounds->loadSoundFX();
+
+	textTimer = new Text;
+	textTimer->setGFont(gFont);
 
 	gameSounds->playMusic();
 	
@@ -81,6 +101,8 @@ void Game::input() {
 void Game::update() {
 }
 
+int texts = 0;
+
 void Game::render() {
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(gRenderer);
@@ -89,14 +111,14 @@ void Game::render() {
 	constexpr int HEART_Y_ALLOWANCE = 15;
 	constexpr int HEART_GAP = 3;
 
-	SDL_Rect heart1 = { 0 + HEART_X_ALLOWANCE, HEART_Y_ALLOWANCE, 
-		imgHeart1->getSrcRect()->w / 7, imgHeart1->getSrcRect()->h / 7};
+	SDL_Rect heart1 = { 0 + HEART_X_ALLOWANCE, HEART_Y_ALLOWANCE,
+		imgHeart1->getSrcRect()->w / 7, imgHeart1->getSrcRect()->h / 7 };
 
-	SDL_Rect heart2 = { (imgHeart2->getSrcRect()->w / 7, 
-		imgHeart2->getSrcRect()->h / 7) + HEART_X_ALLOWANCE + (HEART_GAP * 1), HEART_Y_ALLOWANCE, 
+	SDL_Rect heart2 = { (imgHeart2->getSrcRect()->w / 7,
+		imgHeart2->getSrcRect()->h / 7) + HEART_X_ALLOWANCE + (HEART_GAP * 1), HEART_Y_ALLOWANCE,
 		imgHeart2->getSrcRect()->w / 7, imgHeart2->getSrcRect()->h / 7 };
 
-	SDL_Rect heart3 = { (imgHeart2->getSrcRect()->w / 7, 
+	SDL_Rect heart3 = { (imgHeart2->getSrcRect()->w / 7,
 		imgHeart2->getSrcRect()->h / 7) * 2 + HEART_X_ALLOWANCE + (HEART_GAP * 2), HEART_Y_ALLOWANCE,
 		imgHeart3->getSrcRect()->w / 7, imgHeart3->getSrcRect()->h / 7 };
 
@@ -106,10 +128,22 @@ void Game::render() {
 	imgHeart2->render(gRenderer, &heart2, heartStates.heart2);
 	imgHeart3->render(gRenderer, &heart3, heartStates.heart3);
 
+	SDL_Rect rectCharacter = { 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
+	rectCharacter.x = (SCREEN_WIDTH / 2) - (rectCharacter.w / 2);
+	character->animate(gRenderer, &rectCharacter);
+
+	SDL_Color black = { 0, 0, 0, 255 };
+	textTimer->loadFromRenderedText(gRenderer, std::to_string(texts), black, nullptr );
+	texts++;
+
 	SDL_RenderPresent(gRenderer);
 }
 
 void Game::close() {
-	gameSounds->close();
 	controller1->close();
+	SDL_DestroyRenderer(gRenderer);
+	SDL_DestroyWindow(gWindow);
+	gameSounds->close();
+	IMG_Quit();
+	SDL_Quit();
 }

@@ -10,3 +10,5 @@ constexpr Uint32 SCREEN_FLAGS = SDL_WINDOW_SHOWN;
 
 constexpr Uint16 MAX_FPS = 60;
 constexpr float FRAME_DURATION = 1000.0F / MAX_FPS;
+
+constexpr int FONT_SIZE = 28;

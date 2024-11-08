@@ -27,6 +27,6 @@ void GameFPS::limitFPS() {
     Uint32 frameDuration = SDL_GetTicks() - startFrame;
 
     if (frameDuration < FRAME_DURATION) {
-        SDL_Delay(FRAME_DURATION - frameDuration);
+        SDL_Delay(static_cast<Uint32>(FRAME_DURATION - frameDuration));
     }
 }
