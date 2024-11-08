@@ -30,6 +30,9 @@
     <ClCompile Include="GameFPS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -50,6 +53,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameFPS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

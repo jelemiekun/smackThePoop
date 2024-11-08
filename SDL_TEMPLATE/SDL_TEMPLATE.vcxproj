@@ -22,6 +22,7 @@
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameFPS.cpp" />
+    <ClCompile Include="GameImage.cpp" />
     <ClCompile Include="GameSound.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -33,6 +34,7 @@
     <ClInclude Include="GameController.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameFPS.h" />
+    <ClInclude Include="GameImage.h" />
     <ClInclude Include="GameSound.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

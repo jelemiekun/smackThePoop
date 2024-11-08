@@ -8,6 +8,7 @@ public:
 	~GameController();
 
 	void init();
+	void input();\
 	void close();
 
 	SDL_GameController* getGameController() const;

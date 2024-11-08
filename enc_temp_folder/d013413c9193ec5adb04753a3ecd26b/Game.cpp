@@ -45,8 +45,6 @@ void Game::init() {
 	gameSounds->loadMusic();
 	gameSounds->loadSoundFX();
 
-	
-
 	running = true;
 }
 

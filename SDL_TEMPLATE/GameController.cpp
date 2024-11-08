@@ -22,6 +22,10 @@ SDL_GameController* GameController::getGameController() const {
 	return gGameController;
 }
 
+void GameController::input() {
+
+}
+
 void GameController::close() {
 	SDL_GameControllerClose(gGameController);
 }
