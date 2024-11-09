@@ -57,6 +57,7 @@ private:
 	void gameOver();
 	bool isGameOver() const;
 	void startGame();
+	void restartFlags();
 
 public:
 	Game();

@@ -25,4 +25,6 @@ struct InputFlags {
 	unsigned int SMinPlay : 1;
 	unsigned int SMinSett : 1;
 	unsigned int SMinQuit : 1;
+
+	unsigned int readyToChangeMusic : 1;
 };

@@ -1,7 +1,8 @@
 #include "GameSound.h"
 #include <iostream>
 
-GameSound::GameSound() : gMusic(nullptr), 
+GameSound::GameSound() : gMusicCurrent(nullptr), gMusicStartMenu(nullptr), 
+					gMusicPlaying(nullptr), gMusicGameOver(nullptr),
 					gFXRelief(nullptr), 	gFXGrunt(nullptr),
 					gFXHitPlayer(nullptr),	gFXHitPoop(nullptr), 
 					gFXPoopStart(nullptr),	gFXPoopEnd(nullptr),  
@@ -15,13 +16,24 @@ void GameSound::initMixer() {
 	}
 }
 
-void GameSound::loadMusic() {
-	gMusic = Mix_LoadMUS("assets/music/music.mp3");
+void GameSound::loadMusics() {
+	gMusicStartMenu = Mix_LoadMUS("assets/music/startMenu.mp3");
 
-	if (gMusic == nullptr)
+	if (gMusicStartMenu == nullptr)
 		std::cout << "Failed to load the music: " << Mix_GetError() << '\n';
-	else
-		std::cout << "Music loaded" << '\n';
+	else std::cout << "Music start menu loaded" << '\n';
+
+	gMusicPlaying = Mix_LoadMUS("assets/music/playing.mp3");
+
+	if (gMusicPlaying == nullptr)
+		std::cout << "Failed to load the music: " << Mix_GetError() << '\n';
+	else std::cout << "Music playing loaded" << '\n';
+
+	gMusicGameOver = Mix_LoadMUS("assets/music/gameOver.mp3");
+
+	if (gMusicGameOver == nullptr)
+		std::cout << "Failed to load the music: " << Mix_GetError() << '\n';
+	else std::cout << "Music game over loaded" << '\n';
 }
 
 void GameSound::loadSoundFX() {
@@ -83,13 +95,22 @@ void GameSound::loadSoundFX() {
 	Mix_VolumeChunk(gFXFart, 70);
 }
 
+void GameSound::setMusic(ClassMusic music) {
+	switch (music) {
+	case ClassMusic::startMenu:	gMusicCurrent = gMusicStartMenu; break;
+	case ClassMusic::playing: gMusicCurrent = gMusicPlaying; break;
+	case ClassMusic::gameOver: gMusicCurrent = gMusicGameOver;  break;
+	default: break;
+	}
+}
+
 void GameSound::playMusic() {
 	Mix_VolumeMusic(35);
-	Mix_FadeInMusic(gMusic, -1, 5000);
+	Mix_FadeInMusic(gMusicCurrent, -1, 1500);
 }
 
 void GameSound::stopMusic() {
-	Mix_FadeOutMusic(2000);
+	Mix_FadeOutMusic(500);
 }
 
 void GameSound::setSoundFX(ClassSoundFXState state) {
@@ -133,7 +154,10 @@ void GameSound::close() {
 	Mix_FreeChunk(gFXPoopEnd);
 	Mix_FreeChunk(gFXFart);
 
-	Mix_FreeMusic(gMusic);
+	Mix_FreeMusic(gMusicCurrent);
+	Mix_FreeMusic(gMusicStartMenu);
+	Mix_FreeMusic(gMusicPlaying);
+	Mix_FreeMusic(gMusicGameOver);
 
 	Mix_Quit();
 }

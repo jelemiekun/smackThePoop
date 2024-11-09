@@ -100,8 +100,11 @@ void Game::init() {
 
 	gameSounds = new GameSound;
 	gameSounds->initMixer();
-	gameSounds->loadMusic();
+	gameSounds->loadMusics();
 	gameSounds->loadSoundFX();
+
+	gameSounds->setMusic(ClassMusic::startMenu);
+	gameSounds->playMusic();
 
 	gameTimer = new Timer;
 
@@ -133,6 +136,16 @@ void Game::init() {
 	flags->playing = 0;
 	flags->inGameOver = 0;
 	flags->inStart = 1;
+
+	flags->readyToChangeMusic = 0;
+
+	gameTimer->resetTimer();
+	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
+	gameTimer->startTimer();
+	gameTimer->getTimeInFormat();
+	gameTimer->stopTimer();
+
+	heartStates = { 1, 1, 1 };
 
 	running = true;
 }
@@ -194,6 +207,7 @@ void Game::input() {
 						flags->inStart = 1;
 						flags->playing = 0;
 						flags->GOBGinside = 2;
+						flags->readyToChangeMusic = 1;
 					}
 					break;
 				default:
@@ -203,7 +217,18 @@ void Game::input() {
 
 			// if in start menu
 			if (LIMIT && !flags->inGameOver && !flags->playing && flags->inStart) {
-
+				switch (event.type) {
+				case SDL_KEYDOWN: {
+					switch (event.key.keysym.sym) {
+					case SDLK_1: flags->playing = 0; flags->inStart = 0; flags->inGameOver = 0; break;
+					case SDLK_3: running = false;
+					default:
+						break;
+					}
+				}
+				default:
+					break;
+				}
 			}
 
 			// if playing
@@ -298,75 +323,77 @@ void Game::input() {
 }
 
 void Game::update() {
-	if (flags->FXInProgress && flags->poopInProgress) {
-		poopFart->generateRandomNumber();
-		int state = poopFart->getToReleaseState();
-		ClassSoundFXState temp;
+	if (flags->playing && !flags->inGameOver && !flags->inStart) {
+		if (flags->FXInProgress && flags->poopInProgress) {
+			poopFart->generateRandomNumber();
+			int state = poopFart->getToReleaseState();
+			ClassSoundFXState temp;
 
-		if (state == 0 || state == 1 || state == 2) temp = ClassSoundFXState::poopStart;
-		else if (state == 5) temp = ClassSoundFXState::fart;
+			if (state == 0 || state == 1 || state == 2) temp = ClassSoundFXState::poopStart;
+			else if (state == 5) temp = ClassSoundFXState::fart;
 
-		switch (state) {
-		case 0: flags->kindOfPoop = 0; break;
-		case 1: flags->kindOfPoop = 1; break;
-		case 2: flags->kindOfPoop = 2; break;
-		case 5: flags->kindOfPoop = 3; break;
-		default: break;
+			switch (state) {
+			case 0: flags->kindOfPoop = 0; break;
+			case 1: flags->kindOfPoop = 1; break;
+			case 2: flags->kindOfPoop = 2; break;
+			case 5: flags->kindOfPoop = 3; break;
+			default: break;
+			}
+
+			gameSounds->setSoundFX(temp);
+			gameSounds->playSoundFX();
+
+			flags->FXInProgress = 0;
+
+			poopFXTimer->setStartingTime(ALLOWANCE_TIME_TO_PLAY_POOP_END);
+			poopFXTimer->startTimer();
+
+			poopClickTimer->setStartingTime(ALLOWANCE_TIME_TO_CLICK_PLAYER);
+			poopClickTimer->startTimer();
+
 		}
 
-		gameSounds->setSoundFX(temp);
-		gameSounds->playSoundFX();
-
-		flags->FXInProgress = 0;
-
-		poopFXTimer->setStartingTime(ALLOWANCE_TIME_TO_PLAY_POOP_END);
-		poopFXTimer->startTimer();
-
-		poopClickTimer->setStartingTime(ALLOWANCE_TIME_TO_CLICK_PLAYER);
-		poopClickTimer->startTimer();
-
-	}
-
-	if (flags->poopInProgress && !flags->animateSlap && !flags->takeDamage &&
-		(flags->kindOfPoop == 1 || flags->kindOfPoop == 2) && poopClickTimer->isFinish()) {
-		flags->takeDamage = 1;
-		flags->takeDamageInProgress = 1;
-		flags->takeDamageFinished = 0;
-	}
-
-	if (flags->takeDamage && flags->takeDamageInProgress) {
-		gameSounds->setSoundFX(ClassSoundFXState::hitPlayer);
-		gameSounds->playSoundFX();
-
-		if (heartStates.heart3) {
-			heartStates.heart3 = 0;
-		} else {
-			if (heartStates.heart2) heartStates.heart2 = 0;
-			else heartStates.heart1 = 0;
+		if (flags->poopInProgress && !flags->animateSlap && !flags->takeDamage &&
+			(flags->kindOfPoop == 1 || flags->kindOfPoop == 2) && poopClickTimer->isFinish()) {
+			flags->takeDamage = 1;
+			flags->takeDamageInProgress = 1;
+			flags->takeDamageFinished = 0;
 		}
-		flags->takeDamageInProgress = 0;
-	}
 
-	if (flags->animateSlap && flags->animateSlapInProgress) {
-		gameSounds->setSoundFX(ClassSoundFXState::hitPoop);
-		gameSounds->playSoundFX();
+		if (flags->takeDamage && flags->takeDamageInProgress) {
+			gameSounds->setSoundFX(ClassSoundFXState::hitPlayer);
+			gameSounds->playSoundFX();
 
-		int newReleaseState = 3;
-		if (flags->kindOfPoop == 1) newReleaseState = 3;
-		else if (flags->kindOfPoop == 2) newReleaseState = 4;
-		poopFart->setReleaseState(newReleaseState);
+			if (heartStates.heart3) {
+				heartStates.heart3 = 0;
+			} else {
+				if (heartStates.heart2) heartStates.heart2 = 0;
+				else heartStates.heart1 = 0;
+			}
+			flags->takeDamageInProgress = 0;
+		}
 
-		flags->animateSlapInProgress = 0;
-	}
+		if (flags->animateSlap && flags->animateSlapInProgress) {
+			gameSounds->setSoundFX(ClassSoundFXState::hitPoop);
+			gameSounds->playSoundFX();
 
-	Uint32 temp1 = poopClickTimer->getRawTime();
-	Uint32 temp2 = poopFXTimer->getRawTime();
+			int newReleaseState = 3;
+			if (flags->kindOfPoop == 1) newReleaseState = 3;
+			else if (flags->kindOfPoop == 2) newReleaseState = 4;
+			poopFart->setReleaseState(newReleaseState);
 
-	if ((flags->kindOfPoop == 0 || flags->kindOfPoop == 1 || flags->kindOfPoop == 2)
-		&& flags->poopInProgress && poopFXTimer->isFinish() && flags->isFXPoopFinished) {
-		gameSounds->setSoundFX(ClassSoundFXState::poopEnd);
-		gameSounds->playSoundFX();
-		flags->isFXPoopFinished = 0;
+			flags->animateSlapInProgress = 0;
+		}
+
+		Uint32 temp1 = poopClickTimer->getRawTime();
+		Uint32 temp2 = poopFXTimer->getRawTime();
+
+		if ((flags->kindOfPoop == 0 || flags->kindOfPoop == 1 || flags->kindOfPoop == 2)
+			&& flags->poopInProgress && poopFXTimer->isFinish() && flags->isFXPoopFinished) {
+			gameSounds->setSoundFX(ClassSoundFXState::poopEnd);
+			gameSounds->playSoundFX();
+			flags->isFXPoopFinished = 0;
+		}
 	}
 }
 
@@ -421,14 +448,18 @@ void Game::render() {
 		}
 	}
 
+	// If LIMIT is toggled and not currently playing
 	if (LIMIT && !(!flags->playing && !flags->inGameOver && !flags->inStart)) {
+		//  If currently playing, check if game is finished 
 		if (flags->playing && !flags->inStart && !flags->inGameOver) {
-			flags->playing = !gameTimer->isFinish();
-			flags->playing = !isGameOver();
+			flags->playing = !gameTimer->isFinish(); // Toggle off if timer runs out
+			flags->playing = !isGameOver(); // Toggle off if no hearts left
 
+			// If playing is toggled off, go to game over and stop the timer
 			if (!flags->playing) {
 				flags->inGameOver = 1;
 				gameTimer->stopTimer();
+				flags->readyToChangeMusic = 1; // Change music
 			}
 		}
 	}
@@ -451,40 +482,45 @@ bool Game::isGameOver() const {
 }
 
 void Game::startGame() {
-	flags->playing = 1;
-	flags->inStart = 0;
-	flags->inGameOver = 0;
-	flags->poopInProgress = 0;
-	flags->poopFinished = 1;
-	flags->FXInProgress = 0;
-	flags->FXFinished = 1;
-	flags->isFXPoopFinished = 1;
-	flags->kindOfPoop = 0;
-	flags->takeDamage = 0;
-	flags->takeDamageInProgress = 0;
-	flags->takeDamageFinished = 1;
-	flags->animateSlap = 0;
-	flags->animateSlapInProgress = 0;
-	flags->animateSlapFinished = 1;
-	flags->GOBGoutside = 1;
-	flags->GOBGinside = 0;
-	flags->SMoutside = 1;
-	flags->SMinPlay = 0;
-	flags->SMinSett = 0;
-	flags->SMinQuit = 0;
+	if (Mix_PlayingMusic() && flags->readyToChangeMusic) {
+		gameSounds->stopMusic();
 
+		gameSounds->setMusic(ClassMusic::playing);
+		gameSounds->playMusic();
 
-	if (Mix_PlayingMusic()) gameSounds->stopMusic();
+		flags->readyToChangeMusic = 0;
+	}
+
+	gameSounds->setMusic(ClassMusic::playing);
 	gameSounds->playMusic();
 
+	restartFlags();
+
 	gameTimer->resetTimer();
-	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
+	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY + 1000);
 	gameTimer->startTimer();
 
 	heartStates = { 1, 1, 1 };
 }
 
 void Game::startMenu() {
+	if (Mix_PlayingMusic() && flags->readyToChangeMusic) {
+		gameSounds->stopMusic();
+
+		gameSounds->setMusic(ClassMusic::startMenu);
+		gameSounds->playMusic();
+
+		flags->readyToChangeMusic = 0;
+
+		heartStates = { 1, 1, 1 };
+
+		gameTimer->resetTimer();
+		gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
+		gameTimer->startTimer();
+		gameTimer->getTimeInFormat();
+		gameTimer->stopTimer();
+	}
+
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);
@@ -512,6 +548,15 @@ void Game::startMenu() {
 }
 
 void Game::gameOver() {
+	if (Mix_PlayingMusic() && flags->readyToChangeMusic) {
+		gameSounds->stopMusic();
+
+		gameSounds->setMusic(ClassMusic::gameOver);
+		gameSounds->playMusic();
+
+		flags->readyToChangeMusic = 0;
+	}
+
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);
@@ -548,6 +593,31 @@ void Game::gameOver() {
 	SDL_Rect dstRectPlayAgain = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 3), (SCREEN_HEIGHT / 2) + 10,
 		350, 40 };
 	textPlayAgain->loadFromRenderedText(gRenderer, "DO YOU WANT TO PLAY AGAIN?", blackGOBG, &dstRectPlayAgain);
+}
+
+void Game::restartFlags() {
+	flags->playing = 1;
+	flags->inStart = 0;
+	flags->inGameOver = 0;
+	flags->poopInProgress = 0;
+	flags->poopFinished = 1;
+	flags->FXInProgress = 0;
+	flags->FXFinished = 1;
+	flags->isFXPoopFinished = 1;
+	flags->kindOfPoop = 0;
+	flags->takeDamage = 0;
+	flags->takeDamageInProgress = 0;
+	flags->takeDamageFinished = 1;
+	flags->animateSlap = 0;
+	flags->animateSlapInProgress = 0;
+	flags->animateSlapFinished = 1;
+	flags->GOBGoutside = 1;
+	flags->GOBGinside = 0;
+	flags->SMoutside = 1;
+	flags->SMinPlay = 0;
+	flags->SMinSett = 0;
+	flags->SMinQuit = 0;
+	flags->readyToChangeMusic = 0;
 }
 
 void Game::close() {

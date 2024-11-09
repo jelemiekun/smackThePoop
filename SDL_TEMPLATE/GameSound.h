@@ -11,9 +11,19 @@ enum class ClassSoundFXState {
 	fart
 };
 
+enum class ClassMusic {
+	startMenu,
+	playing,
+	gameOver
+};
+
 class GameSound {
 private:
-	Mix_Music* gMusic;
+
+	Mix_Music* gMusicCurrent;
+	Mix_Music* gMusicStartMenu;
+	Mix_Music* gMusicPlaying;
+	Mix_Music* gMusicGameOver;
 
 	Mix_Chunk* gFXRelief;
 	Mix_Chunk* gFXGrunt;
@@ -31,7 +41,8 @@ public:
 
 	void initMixer();
 	void loadSoundFX();
-	void loadMusic();
+	void loadMusics();
+	void setMusic(ClassMusic music);
 	void playMusic();
 	void stopMusic();
 	void setSoundFX(ClassSoundFXState state);
