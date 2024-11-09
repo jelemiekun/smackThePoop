@@ -48,6 +48,9 @@
     <ClCompile Include="PoopBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PoopFart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -86,6 +89,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PoopBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoopFart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

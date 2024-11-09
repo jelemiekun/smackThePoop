@@ -31,3 +31,12 @@ void Text::loadFromRenderedText(SDL_Renderer* renderer, std::string text, SDL_Co
 
 	GameImage::render(renderer, dstRect);
 }
+
+void Text::close() {
+	if (gFont != nullptr) {
+		TTF_CloseFont(gFont);
+		gFont = nullptr;
+	}
+
+	TTF_Quit();
+}

@@ -7,7 +7,7 @@ Game::Game() : gWindow(nullptr), running(false),
 				imgHeart3(nullptr),
 				controller1(nullptr), gameSounds(nullptr), isPlaying(false),
 				character(nullptr), gFont(nullptr), textTimer(nullptr),
-				timer(nullptr), poopBar(nullptr) {}
+				timer(nullptr), poopBar(nullptr), poopFart(nullptr) {}
 
 Game::~Game() {}
 
@@ -95,6 +95,12 @@ void Game::init() {
 	poopBar->init(gRenderer);
 	poopBar->setXY(150, 10);
 
+	
+	poopFart = new PoopFart;
+	poopFart->loadFromFile(gRenderer, "assets/img/poopFart.png");
+	poopFart->init();
+	poopFart->initSpriteSheet();
+
 	gameSounds->playMusic();
 	
 
@@ -118,8 +124,6 @@ void Game::input() {
 
 void Game::update() {
 }
-
-int texts = 0;
 
 void Game::render() {
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
@@ -155,7 +159,9 @@ void Game::render() {
 
 	poopBar->render(gRenderer);
 
-	texts++;
+
+	
+	poopFart->render(gRenderer);
 
 	SDL_RenderPresent(gRenderer);
 }

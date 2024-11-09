@@ -67,5 +67,9 @@ void PoopBar::render(SDL_Renderer* renderer) {
 }
 
 void PoopBar::close() {
-
+	SDL_DestroyTexture(mTexture);
+	delete rectBorder;
+	for (int i = 0; i < POOP_COUNT; i++) {
+		delete rect[i];
+	}
 }

@@ -7,6 +7,7 @@
 #include "Text.h"
 #include "Timer.h"
 #include "PoopBar.h"
+#include "PoopFart.h"
 
 #include "App_Info.h"
 
@@ -33,6 +34,7 @@ private:
 	Text* textTimer;
 	SDL_Rect* timerRect;
 	PoopBar* poopBar;
+	PoopFart* poopFart;
 	
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/

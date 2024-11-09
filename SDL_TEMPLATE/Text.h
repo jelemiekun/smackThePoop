@@ -15,5 +15,6 @@ public:
 
 	void loadFromRenderedText(SDL_Renderer* renderer, std::string text, SDL_Color color, SDL_Rect* dstRect);
 
+	void close();
 };
 
