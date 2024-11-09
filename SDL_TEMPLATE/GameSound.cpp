@@ -79,31 +79,31 @@ void GameSound::playMusic() {
 	Mix_FadeInMusic(gMusic, -1, 5000);
 }
 
-void GameSound::setSoundFX(Uint8 state) {
-	FXState.fx = { state };
+void GameSound::setSoundFX(ClassSoundFXState state) {
+	FXState = state;
 }
 
 void GameSound::playSoundFX() {
-	switch (FXState.fx) {
-	case 0:
+	switch (FXState) {
+	case ClassSoundFXState::relief:
 		Mix_PlayChannel(-1, gFXRelief, 0);
 		break;
-	case 1:
+	case ClassSoundFXState::grunt:
 		Mix_PlayChannel(-1, gFXGrunt, 0);
 		break;
-	case 2:
+	case ClassSoundFXState::hitPlayer:
 		Mix_PlayChannel(-1, gFXHitPlayer, 0);
 		break;
-	case 3:
+	case ClassSoundFXState::hitPoop:
 		Mix_PlayChannel(-1, gFXHitPoop, 0);
 		break;
-	case 4:
+	case ClassSoundFXState::poopStart:
 		Mix_PlayChannel(-1, gFXPoopStart, 0);
 		break;
-	case 5:
+	case ClassSoundFXState::poopEnd:
 		Mix_PlayChannel(-1, gFXPoopEnd, 0);
 		break;
-	case 6:
+	case ClassSoundFXState::fart:
 		Mix_PlayChannel(-1, gFXFart, 0);
 		break;
 	default:

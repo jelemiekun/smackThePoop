@@ -31,7 +31,9 @@ private:
 	HeartStates heartStates;
 	Character* character;
 	TTF_Font* gFont;
-	Timer* timer;
+	Timer* gameTimer;
+	Timer* poopFXTimer;
+	Timer* poopClickTimer;
 	Text* textTimer;
 	SDL_Rect* timerRect;
 	PoopBar* poopBar;
@@ -44,6 +46,9 @@ private:
 	GameSound* gameSounds;
 	SDL_Event event;
 	bool running;
+
+private:
+	bool isGameOver() const;
 
 public:
 	Game();

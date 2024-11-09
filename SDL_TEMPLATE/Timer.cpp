@@ -1,6 +1,6 @@
 #include "Timer.h"
 
-Timer::Timer() : startingTime(0), currentTime(0), finish(true) {}
+Timer::Timer() : startingTime(0), currentTime(0), finish(true), stopped(false) {}
 
 Timer::~Timer() {}
 
@@ -9,11 +9,17 @@ void Timer::setStartingTime(Uint32 time) {
 }
 
 void Timer::startTimer() {
-	currentTime = SDL_GetTicks();
-	finish = false;
+	if (finish) {
+		currentTime = SDL_GetTicks();
+		finish = false;
+		remainingTime = 0;
+	}
 }
 
 Uint32 Timer::getRawTime() {
+	if (stopped)
+		return remainingTime;
+
 	if (!finish) {
 		Uint32 timeDiff = SDL_GetTicks() - currentTime;
 
@@ -47,4 +53,12 @@ std::string Timer::getTimeInFormat() {
 
 bool Timer::isFinish() const {
 	return finish;
+}
+
+void Timer::stopTimer() {
+	if (!finish && !stopped) {
+		Uint32 timeDiff = SDL_GetTicks() - currentTime;
+		remainingTime = startingTime > timeDiff ? startingTime - timeDiff : 0; 
+		stopped = true; 
+	}
 }

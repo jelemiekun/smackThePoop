@@ -1,8 +1,14 @@
 #pragma once
 #include "SDL_mixer.h"
 
-struct SoundFXState {
-	unsigned int fx : 3;
+enum class ClassSoundFXState {
+	relief,
+	grunt,
+	hitPlayer,
+	hitPoop,
+	poopStart,
+	poopEnd,
+	fart
 };
 
 class GameSound {
@@ -17,7 +23,7 @@ private:
 	Mix_Chunk* gFXPoopEnd;
 	Mix_Chunk* gFXFart;
 
-	SoundFXState FXState = { 0 };
+	ClassSoundFXState FXState;
 
 public:
 	GameSound();
@@ -27,7 +33,7 @@ public:
 	void loadSoundFX();
 	void loadMusic();
 	void playMusic();
-	void setSoundFX(Uint8 state);
+	void setSoundFX(ClassSoundFXState state);
 	void playSoundFX();
 	void close();
 };

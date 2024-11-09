@@ -12,11 +12,16 @@ PoopFart::PoopFart() : toRelease(nullptr), frameCount(0), finishRendering(true),
 
 PoopFart::~PoopFart() {}
 
-unsigned int PoopFart::getRandomNumber() {
+void PoopFart::generateRandomNumber() {
 	static std::random_device dev;
 	static std::mt19937 rng(dev());
 	std::uniform_int_distribution<std::mt19937::result_type> dist6(0, ANIMATION_PARTS - 1);
-	return dist6(rng);
+
+	int num = dist6(rng);
+
+	if (num == 3) num += 2;
+	else if (num == 4) num++;
+	toRelease->state = num;
 }
 
 void PoopFart::init() {
@@ -55,25 +60,30 @@ unsigned int PoopFart::getToReleaseState() {
 	return toRelease->state;
 }
 
-void PoopFart::render(SDL_Renderer* renderer) {
+bool PoopFart::isFinishRendering() const {
+	return finishRendering;
+}
 
+void PoopFart::setFinishRendering(bool finish) {
+	finishRendering = finish;
+}
+
+void PoopFart::render(SDL_Renderer* renderer) {
 	if (finishRendering) {
-		toRelease->state = getRandomNumber();
 		finishRendering = false;
 	}
 
 	SDL_Rect* currentClip = rectArrays[toRelease->state][frameCount / EACH_FRAME_DURATION];
 
-	SDL_RenderCopy(renderer, mTexture, currentClip, dstRect);
 
 	++frameCount;
 
 	if (frameCount / EACH_FRAME_DURATION >= FRAMES_PER_ANIMATION) {
 		finishRendering = true;
 		frameCount = 0;
+	} else {
+		SDL_RenderCopy(renderer, mTexture, currentClip, dstRect);
 	}
-
-
 }
 
 void PoopFart::close() {

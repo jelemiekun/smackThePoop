@@ -9,7 +9,9 @@ class Timer {
 private:
 	Uint32 startingTime;
 	Uint32 currentTime;
+	Uint32 remainingTime;
 	bool finish;
+	bool stopped;
 
 public:
 	Timer();
@@ -24,5 +26,7 @@ public:
 	std::string getTimeInFormat();
 
 	bool isFinish() const;
+
+	void stopTimer();
 };
 

@@ -20,9 +20,6 @@ private:
 
 	ToRelease* toRelease;
 
-private:
-	unsigned int getRandomNumber();
-
 public:
 	PoopFart();
 	~PoopFart();
@@ -31,6 +28,9 @@ public:
 	void init();
 	void initSpriteSheet();
 	unsigned int getToReleaseState();
+	void generateRandomNumber();
+	bool isFinishRendering() const;
+	void setFinishRendering(bool finish);
 	void render(SDL_Renderer* renderer);
 	void close();
 };
