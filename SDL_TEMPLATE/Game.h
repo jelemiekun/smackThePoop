@@ -25,6 +25,7 @@ private:
 
 	GameImage* imgBackground;
 	GameImage* imgGameOverBG;
+	GameImage* imgStartBG;
 	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;

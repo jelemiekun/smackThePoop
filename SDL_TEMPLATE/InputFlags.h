@@ -20,4 +20,9 @@ struct InputFlags {
 
 	unsigned int GOBGoutside : 1;
 	unsigned int GOBGinside : 2;
+
+	unsigned int SMoutside : 1;
+	unsigned int SMinPlay : 1;
+	unsigned int SMinSett : 1;
+	unsigned int SMinQuit : 1;
 };

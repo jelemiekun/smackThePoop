@@ -18,15 +18,11 @@ public:
 	~Timer();
 
 	void setStartingTime(Uint32 time);
-
 	void startTimer();
-
 	Uint32 getRawTime();
-
 	std::string getTimeInFormat();
-
 	bool isFinish() const;
-
 	void stopTimer();
+	void resetTimer();
 };
 

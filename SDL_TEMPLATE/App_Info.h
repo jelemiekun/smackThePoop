@@ -32,3 +32,11 @@ constexpr int POOP_COUNT = 15;
 constexpr int POOPFART_ANIMATION_PARTS = 6;
 constexpr int POOPFART_FRAMES_PER_ANIMATION = 8;
 constexpr int POOPFART_EACH_FRAME_DURATION = 6;
+
+/*
+Abbreviations:
+SM - Start Menu 
+GOBG - Game Over Background
+R1 - Rectangle 1
+R2 - Rectangle 2
+*/

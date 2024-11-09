@@ -62,3 +62,11 @@ void Timer::stopTimer() {
 		stopped = true; 
 	}
 }
+
+void Timer::resetTimer() {
+	finish = true;
+	stopped = false;
+	startingTime = 0;
+	currentTime = 0;
+	remainingTime = 0;
+}
