@@ -138,6 +138,10 @@ void Game::init() {
 	flags->inStart = 1;
 
 	flags->readyToChangeMusic = 0;
+	
+	flags->SMinPlayClick = 0;
+	flags->SMinSettClick = 0;
+	flags->SMinQuitClick = 0;
 
 	gameTimer->resetTimer();
 	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
@@ -155,13 +159,27 @@ bool Game::isRunning() const {
 }
 
 void Game::input() {
+	/*
+	SMP - Start Menu Play,
+	SMS - Start Menu Settings
+	SMQ - Start Menu quit
+	*/
+	static constexpr SDL_Rect SMP1 = { 243, 223, 169, 86 };
+	static constexpr SDL_Rect SMP2 = { 228, 239, 200, 55 };
+	static constexpr SDL_Rect SMS1 = { 149 + 48, 380 - 55, 254, 86 };
+	static constexpr SDL_Rect SMS2 = { 134 + 48, 398 - 58, 284, 56 };
+	static constexpr SDL_Rect SMQ1 = { 243, 426, 169, 86 };
+	static constexpr SDL_Rect SMQ2 = { 228, 442, 200, 55 };
+	bool SMoutsidePlay;
+	bool SMoutsideSett;
+	bool SMoutsideQuit;
+
 	static constexpr SDL_Rect GOBGyesR1 = { 141, 380, 146, 90 };
 	static constexpr SDL_Rect GOBGyesR2 = { 133, 398, 163, 56 };
 	static constexpr SDL_Rect GOBGnoR1 = { 141 + 221, 380, 146, 90 };
 	static constexpr SDL_Rect GOBGnoR2 = { 133 + 221, 398, 163, 56 };
 	bool GOBGoutsideYes;
 	bool GOBGoutsideNo;
-
 
 	int x;
 	int y;
@@ -218,14 +236,42 @@ void Game::input() {
 			// if in start menu
 			if (LIMIT && !flags->inGameOver && !flags->playing && flags->inStart) {
 				switch (event.type) {
-				case SDL_KEYDOWN: {
-					switch (event.key.keysym.sym) {
-					case SDLK_1: flags->playing = 0; flags->inStart = 0; flags->inGameOver = 0; break;
-					case SDLK_3: running = false;
-					default:
-						break;
+				case SDL_MOUSEMOTION:
+					x = event.motion.x;
+					y = event.motion.y;
+
+					SMoutsidePlay = x < SMP1.x || x > SMP1.x + SMP1.w || y < SMP1.y || y > SMP1.y + SMP1.h ||
+						x < SMP2.x || x > SMP2.x + SMP2.w || y < SMP2.y || y > SMP2.y + SMP2.h;
+					SMoutsideSett = x < SMS1.x || x > SMS1.x + SMS1.w || y < SMS1.y || y > SMS1.y + SMS1.h ||
+						x < SMS2.x || x > SMS2.x + SMS2.w || y < SMS2.y || y > SMS2.y + SMS2.h;
+					SMoutsideQuit = x < SMQ1.x || x > SMQ1.x + SMQ1.w || y < SMQ1.y || y > SMQ1.y + SMQ1.h ||
+						x < SMQ2.x || x > SMQ2.x + SMQ2.w || y < SMQ2.y || y > SMQ2.y + SMQ2.h;
+
+					if (SMoutsidePlay && SMoutsideSett && SMoutsideQuit) {
+						flags->SMoutside = 1;
+					} else {
+						flags->SMoutside = 0;
+
+						if (!SMoutsidePlay) { flags->SMinPlay = 1; flags->SMinSett = 0; flags->SMinQuit = 0; std::cout << "meow" << '\n'; }
+						if (!SMoutsideSett) { flags->SMinPlay = 0; flags->SMinSett = 1; flags->SMinQuit = 0; }
+						if (!SMoutsideQuit) { flags->SMinPlay = 0; flags->SMinSett = 0; flags->SMinQuit = 1; }
 					}
+					break;
+				case SDL_MOUSEBUTTONDOWN: {
+					if (flags->SMinPlay) flags->SMinPlayClick = 1;
+					if (flags->SMinSett) flags->SMinSettClick = 1;
+					if (flags->SMinQuit) flags->SMinQuitClick = 1;
 				}
+					break;
+				case SDL_MOUSEBUTTONUP:
+					if (flags->SMinPlay) {
+						flags->SMinPlayClick = 0;
+						flags->playing = 0;
+						flags->inStart = 0;
+						flags->inGameOver = 0;
+					}
+					if (flags->SMinSett) flags->SMinSettClick = 0;
+					if (flags->SMinQuit) { flags->SMinQuitClick = 0; running = false; }
 				default:
 					break;
 				}
@@ -535,9 +581,20 @@ void Game::startMenu() {
 	SDL_Rect srcRect = { (wSM / 7) * 0, 0, wSM / 7, hSM };
 
 	if (!flags->SMoutside) {
-		if (flags->SMinPlay) srcRect.x = (wSM / 7) * 1;
-		if (flags->SMinSett) srcRect.x = (wSM / 7) * 3;
-		if (flags->SMinQuit) srcRect.x = (wSM / 7) * 5;
+		if (flags->SMinPlay) { 
+			if (flags->SMinPlayClick) srcRect.x = (wSM / 7) * 2; 
+			else srcRect.x = (wSM / 7) * 1;
+		}
+
+		if (flags->SMinSett) {
+			if (flags->SMinSettClick) srcRect.x = (wSM / 7) * 4;
+			else srcRect.x = (wSM / 7) * 3;
+		}
+
+		if (flags->SMinQuit) { 
+			if (flags->SMinQuitClick) srcRect.x = (wSM / 7) * 6;
+			else srcRect.x = (wSM / 7) * 5; 
+		}
 	}
 
 	SDL_Rect SMDstRect = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 60, (SCREEN_HEIGHT / 2) - ((srcRect.h) / 3) - 40,
@@ -617,6 +674,9 @@ void Game::restartFlags() {
 	flags->SMinPlay = 0;
 	flags->SMinSett = 0;
 	flags->SMinQuit = 0;
+	flags->SMinPlayClick = 0;
+	flags->SMinSettClick = 0;
+	flags->SMinQuitClick = 0;
 	flags->readyToChangeMusic = 0;
 }
 
