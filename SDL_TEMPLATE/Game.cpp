@@ -6,9 +6,11 @@ Game::Game() : gWindow(nullptr), running(false),
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
 				imgHeart3(nullptr),
 				controller1(nullptr), gameSounds(nullptr),
-				character(nullptr), gFont(nullptr), textTimer(nullptr),
+				character(nullptr), gFontTimer(nullptr), textTimer(nullptr),
 				gameTimer(nullptr), poopBar(nullptr), poopFart(nullptr), flags(nullptr),
-				poopFXTimer(nullptr), poopClickTimer(nullptr) {}
+				poopFXTimer(nullptr), poopClickTimer(nullptr), imgGameOverBG(nullptr),
+				textGameOver(nullptr), gFontGame(nullptr), gFontPlayAgain(nullptr),
+				textPlayAgain(nullptr) {}
 
 Game::~Game() {}
 
@@ -41,14 +43,38 @@ void Game::init() {
 	else
 		std::cout << "SDL_TTF initialized." << '\n';
 
-	gFont = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE);
-	if (gFont == nullptr)
+	gFontTimer = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE_TIMER);
+	if (gFontTimer == nullptr)
 		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
 	else
 		std::cout << "Font yubold loaded." << '\n';
 
+	gFontGame = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE_GAME);
+	if (gFontGame == nullptr)
+		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
+	else
+		std::cout << "Font yubold loaded." << '\n';
+
+	gFontPlayAgain = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE_PLAY_AGAIN);
+	if (gFontPlayAgain == nullptr)
+		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
+	else
+		std::cout << "Font yubold loaded." << '\n';
+
+	textTimer = new Text;
+	textTimer->setGFont(gFontTimer);
+
+	textGameOver = new Text;
+	textGameOver->setGFont(gFontGame);
+
+	textPlayAgain = new Text;
+	textPlayAgain->setGFont(gFontPlayAgain);
+
 	imgBackground = new GameImage;
 	imgBackground->loadFromFile(gRenderer, "assets/img/background.png");
+
+	imgGameOverBG = new GameImage;
+	imgGameOverBG->loadFromFile(gRenderer, "assets/img/gameOverBG.png");
 
 	imgHeart1 = new Heart;
 	imgHeart1->loadFromFile(gRenderer, "assets/img/heart.png");
@@ -84,8 +110,6 @@ void Game::init() {
 
 	poopClickTimer = new Timer;
 
-	textTimer = new Text;
-	textTimer->setGFont(gFont);
 
 	constexpr int TIMER_RECT_X_ALLOWANCE = 20;
 	constexpr int TIMER_RECT_Y_ALLOWANCE = 8;
@@ -110,6 +134,8 @@ void Game::init() {
 	
 	flags = new InputFlags;
 	flags->playing = 1;
+	flags->inStart = 0;
+	flags->inGameOver = 0;
 	flags->poopInProgress = 0;
 	flags->poopFinished = 1;
 	flags->FXInProgress = 0;
@@ -122,6 +148,8 @@ void Game::init() {
 	flags->animateSlap = 0;
 	flags->animateSlapInProgress = 0;
 	flags->animateSlapFinished = 1;
+	flags->GOBGoutside = 1;
+	flags->GOBGinside = 0;
 
 	running = true;
 }
@@ -131,95 +159,142 @@ bool Game::isRunning() const {
 }
 
 void Game::input() {
+	SDL_Rect yesR1 = { 141, 380, 146, 90 };
+	SDL_Rect yesR2 = { 133, 398, 163, 56 };
+	SDL_Rect noR1 = { 141 + 221, 380, 146, 90 };
+	SDL_Rect noR2 = { 133 + 221, 398, 163, 56 };
+	int x;
+	int y;
+	bool outsideYes;
+	bool outsideNo;
+
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT) {
 			running = false;
 		} else {
-			if (flags->playing) {
+			if (LIMIT && flags->inGameOver) {
 				switch (event.type) {
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-					case PRIMARY_BUTTON:
-						if (flags->poopFinished) {
-							flags->poopInProgress = 1;
-							flags->poopFinished = 0;
-							flags->FXInProgress = 1;
-							flags->FXFinished = 0;
-						}
-						break;
-					case LEFT_BUTTON:
-						if (flags->poopInProgress) {
-							if (poopClickTimer->isFinish()) {
-								flags->takeDamage = 1;
-							} else {
-								switch (flags->kindOfPoop) {
-								case 0: case 2: case 3: {
-									if (flags->takeDamageFinished && flags->animateSlapFinished) {
-										flags->takeDamage = 1;
-										flags->takeDamageInProgress = 1;
-										flags->takeDamageFinished = 0;
-									}
-								}
-									  break;
-								case 1: {
-									if (flags->animateSlapFinished && flags->takeDamageFinished) {
-										flags->animateSlap = 1;
-										flags->animateSlapInProgress = 1;
-										flags->animateSlapFinished = 0;
-									}
-								}
-									  break;
-								default: break;
-								}
-							}
-						}
-						break;
-					case RIGHT_BUTTON:
-						if (flags->poopInProgress) {
-							if (poopClickTimer->isFinish()) {
-								flags->takeDamage = 1;
-							} else {
-								switch (flags->kindOfPoop) {
-								case 0: case 1: case 3: {
-									if (flags->takeDamageFinished && flags->animateSlapFinished) {
-										flags->takeDamage = 1;
-										flags->takeDamageInProgress = 1;
-										flags->takeDamageFinished = 0;
-									}
-								}
-									  break;
-								case 2: {
-									if (flags->animateSlapFinished && flags->takeDamageFinished) {
-										flags->animateSlap = 1;
-										flags->animateSlapInProgress = 1;
-										flags->animateSlapFinished = 0;
-									}
-								}
-									  break;
-								default: break;
-								}
-							}
-						}
-						break;
-					default:
-						break;
+				case SDL_MOUSEMOTION:
+					x = event.motion.x;
+					y = event.motion.y;
+
+					outsideYes = x < yesR1.x || x > yesR1.x + yesR1.w || y < yesR1.y || y > yesR1.y + yesR1.h;
+					outsideNo = x < noR1.x || x > noR1.x + noR1.w || y < noR1.y || y > noR1.y + noR1.h;
+
+					if (outsideYes && outsideNo) {
+						flags->GOBGoutside = 1;
+					} else {
+						flags->GOBGoutside = 0;
+
+						if (!outsideYes) flags->GOBGinside = 0;
+						if (!outsideNo) flags->GOBGinside = 2;
 					}
 					break;
-				case SDL_KEYUP:
-					switch (event.key.keysym.sym) {
-					case PRIMARY_BUTTON:
-						break;
-					case LEFT_BUTTON:
-						break;
-					case RIGHT_BUTTON:
-						break;
-					default:
-						break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (flags->GOBGinside == 0) flags->GOBGinside = 1;
+					if (flags->GOBGinside == 2) flags->GOBGinside = 3;
+					break;
+				case SDL_MOUSEBUTTONUP:
+					if (flags->GOBGinside == 1) {
+						std::cout << "meow" << '\n';
+						flags->GOBGinside = 0;
+					}
+					if (flags->GOBGinside == 3) {
+						running = false;
+						flags->GOBGinside = 2;
 					}
 					break;
 				default:
 					break;
 				}
+			}
+
+
+			if (LIMIT && !flags->playing) return;
+			
+			switch (event.type) {
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+				case PRIMARY_BUTTON:
+					if (flags->poopFinished) {
+						flags->poopInProgress = 1;
+						flags->poopFinished = 0;
+						flags->FXInProgress = 1;
+						flags->FXFinished = 0;
+					}
+					break;
+				case LEFT_BUTTON:
+					if (flags->poopInProgress) {
+						if (poopClickTimer->isFinish()) {
+							flags->takeDamage = 1;
+						} else {
+							switch (flags->kindOfPoop) {
+							case 0: case 2: case 3: {
+								if (flags->takeDamageFinished && flags->animateSlapFinished) {
+									flags->takeDamage = 1;
+									flags->takeDamageInProgress = 1;
+									flags->takeDamageFinished = 0;
+								}
+							}
+								  break;
+							case 1: {
+								if (flags->animateSlapFinished && flags->takeDamageFinished) {
+									flags->animateSlap = 1;
+									flags->animateSlapInProgress = 1;
+									flags->animateSlapFinished = 0;
+								}
+							}
+								  break;
+							default: break;
+							}
+						}
+					}
+					break;
+				case RIGHT_BUTTON:
+					if (flags->poopInProgress) {
+						if (poopClickTimer->isFinish()) {
+							flags->takeDamage = 1;
+						} else {
+							switch (flags->kindOfPoop) {
+							case 0: case 1: case 3: {
+								if (flags->takeDamageFinished && flags->animateSlapFinished) {
+									flags->takeDamage = 1;
+									flags->takeDamageInProgress = 1;
+									flags->takeDamageFinished = 0;
+								}
+							}
+								  break;
+							case 2: {
+								if (flags->animateSlapFinished && flags->takeDamageFinished) {
+									flags->animateSlap = 1;
+									flags->animateSlapInProgress = 1;
+									flags->animateSlapFinished = 0;
+								}
+							}
+								  break;
+							default: break;
+							}
+						}
+					}
+					break;
+				default:
+					break;
+				}
+				break;
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym) {
+				case PRIMARY_BUTTON:
+					break;
+				case LEFT_BUTTON:
+					break;
+				case RIGHT_BUTTON:
+					break;
+				default:
+					break;
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -278,6 +353,11 @@ void Game::update() {
 	if (flags->animateSlap && flags->animateSlapInProgress) {
 		gameSounds->setSoundFX(ClassSoundFXState::hitPoop);
 		gameSounds->playSoundFX();
+
+		int newReleaseState = 3;
+		if (flags->kindOfPoop == 1) newReleaseState = 3;
+		else if (flags->kindOfPoop == 2) newReleaseState = 4;
+		poopFart->setReleaseState(newReleaseState);
 
 		flags->animateSlapInProgress = 0;
 	}
@@ -344,19 +424,64 @@ void Game::render() {
 		}
 	}
 
-
-	SDL_RenderPresent(gRenderer);
-
 	if (LIMIT) {
 		flags->playing = !gameTimer->isFinish();
 		flags->playing = !isGameOver();
 
-		if (!flags->playing) gameTimer->stopTimer();
+		if (!flags->playing) {
+			flags->inGameOver = 1;
+			gameTimer->stopTimer();
+		}
 	}
+
+	if (LIMIT && !flags->playing) gameOver();
+
+	SDL_RenderPresent(gRenderer);
 }
 
 bool Game::isGameOver() const {
 	return !heartStates.heart1;
+}
+
+void Game::gameOver() {
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
+	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);
+	SDL_Rect whiteTransparent = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	SDL_RenderFillRect(gRenderer, &whiteTransparent);
+
+	int wGOBG = 0;
+	int hGOBG = 0;
+
+	SDL_QueryTexture(imgGameOverBG->mTexture, NULL, NULL, &wGOBG, &hGOBG);
+
+	SDL_Rect srcRect = { (wGOBG / 5) * 0, 0, wGOBG / 5, hGOBG };
+
+	if (flags->GOBGoutside) {
+		srcRect.x = (wGOBG / 5) * 0;
+	} else {
+		switch (flags->GOBGinside) {
+		case 0: srcRect.x = (wGOBG / 5) * 1; break;
+		case 1: srcRect.x = (wGOBG / 5) * 2; break;
+		case 2: srcRect.x = (wGOBG / 5) * 3; break;
+		case 3: srcRect.x = (wGOBG / 5) * 4; break;
+		default: break;
+		}
+	}
+
+	SDL_Rect gameOverDstRect = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 15, (SCREEN_HEIGHT / 2) - ((srcRect.h) / 3) - 20,
+	500, 400 };
+
+	imgGameOverBG->srcRect = &srcRect;
+	imgGameOverBG->render(gRenderer, &gameOverDstRect);
+
+	SDL_Color blackGOBG = { 0, 0, 0, 255 };
+	SDL_Rect dstRectGameOver = { 145, 150 , 370, 150 };
+	textGameOver->loadFromRenderedText(gRenderer, "GAME OVER", blackGOBG, &dstRectGameOver);
+
+	SDL_Rect dstRectPlayAgain = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 3), (SCREEN_HEIGHT / 2) + 10,
+		350, 40 };
+	textPlayAgain->loadFromRenderedText(gRenderer, "DO YOU WANT TO PLAY AGAIN?", blackGOBG, &dstRectPlayAgain);
 }
 
 void Game::close() {

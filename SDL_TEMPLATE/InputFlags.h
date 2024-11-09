@@ -2,6 +2,9 @@
 struct InputFlags {
 	unsigned int playing : 1;
 
+	unsigned int inStart : 1;
+	unsigned int inGameOver : 1;
+
 	unsigned int poopInProgress : 1;
 	unsigned int poopFinished : 1;
 	unsigned int FXInProgress : 1;
@@ -14,4 +17,7 @@ struct InputFlags {
 	unsigned int animateSlap : 1;
 	unsigned int animateSlapInProgress : 1;
 	unsigned int animateSlapFinished : 1;
+
+	unsigned int GOBGoutside : 1;
+	unsigned int GOBGinside : 2;
 };

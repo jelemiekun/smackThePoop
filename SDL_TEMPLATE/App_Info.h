@@ -11,13 +11,15 @@ constexpr Uint32 SCREEN_FLAGS = SDL_WINDOW_SHOWN;
 constexpr Uint16 MAX_FPS = 60;
 constexpr float FRAME_DURATION = 1000.0F / MAX_FPS;
 
-constexpr int FONT_SIZE = 28;
+constexpr int FONT_SIZE_TIMER = 28;
+constexpr int FONT_SIZE_GAME = 34;
+constexpr int FONT_SIZE_PLAY_AGAIN = 16;
 
 constexpr auto PRIMARY_BUTTON = SDLK_RETURN;
 constexpr auto LEFT_BUTTON = SDLK_j;
 constexpr auto RIGHT_BUTTON = SDLK_k;
 
-constexpr bool LIMIT = false;
+constexpr bool LIMIT = true;
 
 constexpr int ALLOWANCE_TIME_TO_PLAY_POOP_END = 500;
 constexpr int ALLOWANCE_TIME_TO_CLICK_PLAYER = 500;

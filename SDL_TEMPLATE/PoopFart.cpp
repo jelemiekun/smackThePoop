@@ -68,6 +68,10 @@ void PoopFart::setFinishRendering(bool finish) {
 	finishRendering = finish;
 }
 
+void PoopFart::setReleaseState(int state) {
+	toRelease->state = state;
+}
+
 void PoopFart::render(SDL_Renderer* renderer) {
 	if (finishRendering) {
 		finishRendering = false;

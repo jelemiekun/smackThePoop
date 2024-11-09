@@ -24,17 +24,22 @@ private:
 	SDL_Renderer* gRenderer;
 
 	GameImage* imgBackground;
+	GameImage* imgGameOverBG;
 	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;
 	Heart* imgHeart3;
 	HeartStates heartStates;
 	Character* character;
-	TTF_Font* gFont;
+	TTF_Font* gFontTimer;
+	TTF_Font* gFontGame;
+	TTF_Font* gFontPlayAgain;
 	Timer* gameTimer;
 	Timer* poopFXTimer;
 	Timer* poopClickTimer;
 	Text* textTimer;
+	Text* textGameOver;
+	Text* textPlayAgain;
 	SDL_Rect* timerRect;
 	PoopBar* poopBar;
 	PoopFart* poopFart;
@@ -48,6 +53,7 @@ private:
 	bool running;
 
 private:
+	void gameOver();
 	bool isGameOver() const;
 
 public:
