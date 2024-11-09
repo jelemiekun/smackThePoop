@@ -2,7 +2,9 @@
 
 Text::Text() : gFont(nullptr) {}
 
-Text::~Text() {}
+Text::~Text() {
+	close();
+}
 
 void Text::setGFont(TTF_Font* font) {
 	gFont = font;
@@ -37,6 +39,4 @@ void Text::close() {
 		TTF_CloseFont(gFont);
 		gFont = nullptr;
 	}
-
-	TTF_Quit();
 }

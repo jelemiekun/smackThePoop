@@ -9,7 +9,7 @@ class PoopFart : public GameImage {
 private:
 	static constexpr int ANIMATION_PARTS = 6;
 	static constexpr int FRAMES_PER_ANIMATION = 8;
-	static constexpr int EACH_FRAME_DURATION = 5;
+	static constexpr int EACH_FRAME_DURATION = 6;
 	int frameCount;
 	bool finishRendering;
 	int widthEachSprite;

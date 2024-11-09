@@ -5,9 +5,9 @@
 Game::Game() : gWindow(nullptr), running(false), 
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
 				imgHeart3(nullptr),
-				controller1(nullptr), gameSounds(nullptr), isPlaying(false),
+				controller1(nullptr), gameSounds(nullptr),
 				character(nullptr), gFont(nullptr), textTimer(nullptr),
-				timer(nullptr), poopBar(nullptr), poopFart(nullptr) {}
+				timer(nullptr), poopBar(nullptr), poopFart(nullptr), flags(nullptr) {}
 
 Game::~Game() {}
 
@@ -103,6 +103,7 @@ void Game::init() {
 
 	gameSounds->playMusic();
 	
+	flags = new InputFlags;
 
 	running = true;
 }
@@ -115,9 +116,6 @@ void Game::input() {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT) {
 			running = false;
-		}
-		if (controller1->getGameController() != nullptr) {
-			controller1->input();
 		}
 	}
 }
@@ -144,23 +142,18 @@ void Game::render() {
 		imgHeart2->getSrcRect()->h / 7) * 2 + HEART_X_ALLOWANCE + (HEART_GAP * 2), HEART_Y_ALLOWANCE,
 		imgHeart3->getSrcRect()->w / 7, imgHeart3->getSrcRect()->h / 7 };
 
-
 	imgBackground->render(gRenderer, nullptr);
 	imgHeart1->render(gRenderer, &heart1, heartStates.heart1);
 	imgHeart2->render(gRenderer, &heart2, heartStates.heart2);
 	imgHeart3->render(gRenderer, &heart3, heartStates.heart3);
 
-	SDL_Rect rectCharacter = { 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
-	rectCharacter.x = (SCREEN_WIDTH / 2) - (rectCharacter.w / 2);
-	character->animate(gRenderer, &rectCharacter);
+	
+	character->animate(gRenderer);
 
 	SDL_Color black = { 0, 0, 0, 255 };
 	textTimer->loadFromRenderedText(gRenderer, timer->getTimeInFormat(), black, timerRect );
 
 	poopBar->render(gRenderer);
-
-
-	
 	poopFart->render(gRenderer);
 
 	SDL_RenderPresent(gRenderer);
@@ -171,6 +164,7 @@ void Game::close() {
 	SDL_DestroyRenderer(gRenderer);
 	SDL_DestroyWindow(gWindow);
 	gameSounds->close();
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }

@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "PoopBar.h"
 #include "PoopFart.h"
+#include "InputFlags.h"
 
 #include "App_Info.h"
 
@@ -23,12 +24,12 @@ private:
 	SDL_Renderer* gRenderer;
 
 	GameImage* imgBackground;
+	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;
 	Heart* imgHeart3;
 	HeartStates heartStates;
 	Character* character;
-	bool isPlaying;
 	TTF_Font* gFont;
 	Timer* timer;
 	Text* textTimer;
