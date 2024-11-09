@@ -196,11 +196,15 @@ void Game::input() {
 					break;
 				case SDL_MOUSEBUTTONUP:
 					if (flags->GOBGinside == 1) {
-						std::cout << "meow" << '\n';
+						flags->inGameOver = 0;
+						flags->inStart = 0;
+						flags->playing = 1;
 						flags->GOBGinside = 0;
 					}
 					if (flags->GOBGinside == 3) {
-						running = false;
+						flags->inGameOver = 0;
+						flags->inStart = 1;
+						flags->playing = 0;
 						flags->GOBGinside = 2;
 					}
 					break;
@@ -434,7 +438,11 @@ void Game::render() {
 		}
 	}
 
-	if (LIMIT && !flags->playing) gameOver();
+	if (!flags->playing && flags->inStart && !flags->inGameOver) start();
+
+	if (flags->playing && !flags->inStart && !flags->inGameOver) startGame();
+
+	if (LIMIT && !flags->playing && !flags->inStart && flags->inGameOver) gameOver();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -443,7 +451,17 @@ bool Game::isGameOver() const {
 	return !heartStates.heart1;
 }
 
+void Game::startGame() {
+	gameTimer->startTimer();
+	std::cout << "meow" << '\n';
+}
+
+void Game::start() {
+	std::cout << "arf" << '\n';
+}
+
 void Game::gameOver() {
+	std::cout << "g o" << '\n';
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);

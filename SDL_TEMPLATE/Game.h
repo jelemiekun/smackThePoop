@@ -55,6 +55,7 @@ private:
 private:
 	void gameOver();
 	bool isGameOver() const;
+	void startGame();
 
 public:
 	Game();
@@ -62,6 +63,7 @@ public:
 
 public:
 	void init();
+	void start();
 	void input();
 	void update();
 	void render();
