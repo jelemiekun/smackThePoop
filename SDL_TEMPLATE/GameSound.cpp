@@ -88,6 +88,10 @@ void GameSound::playMusic() {
 	Mix_FadeInMusic(gMusic, -1, 5000);
 }
 
+void GameSound::stopMusic() {
+	Mix_FadeOutMusic(2000);
+}
+
 void GameSound::setSoundFX(ClassSoundFXState state) {
 	FXState = state;
 }

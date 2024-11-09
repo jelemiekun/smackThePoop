@@ -33,6 +33,7 @@ public:
 	void loadSoundFX();
 	void loadMusic();
 	void playMusic();
+	void stopMusic();
 	void setSoundFX(ClassSoundFXState state);
 	void playSoundFX();
 	void close();

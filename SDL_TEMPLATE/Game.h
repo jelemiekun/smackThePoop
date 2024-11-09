@@ -63,7 +63,7 @@ public:
 
 public:
 	void init();
-	void start();
+	void startMenu();
 	void input();
 	void update();
 	void render();

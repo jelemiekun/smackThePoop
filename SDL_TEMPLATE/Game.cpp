@@ -92,8 +92,6 @@ void Game::init() {
 	character->loadFromFile(gRenderer, "assets/img/player.png");
 	character->init();
 
-	heartStates = { 1, 1, 1 };
-
 	controller1 = new GameController;
 	controller1->init();
 
@@ -103,13 +101,10 @@ void Game::init() {
 	gameSounds->loadSoundFX();
 
 	gameTimer = new Timer;
-	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
-	gameTimer->startTimer();
 
 	poopFXTimer = new Timer;
 
 	poopClickTimer = new Timer;
-
 
 	constexpr int TIMER_RECT_X_ALLOWANCE = 20;
 	constexpr int TIMER_RECT_Y_ALLOWANCE = 8;
@@ -129,27 +124,8 @@ void Game::init() {
 	poopFart->loadFromFile(gRenderer, "assets/img/poopFart.png");
 	poopFart->init();
 	poopFart->initSpriteSheet();
-
-	gameSounds->playMusic();
 	
 	flags = new InputFlags;
-	flags->playing = 1;
-	flags->inStart = 0;
-	flags->inGameOver = 0;
-	flags->poopInProgress = 0;
-	flags->poopFinished = 1;
-	flags->FXInProgress = 0;
-	flags->FXFinished = 1;
-	flags->isFXPoopFinished = 1;
-	flags->kindOfPoop = 0;
-	flags->takeDamage = 0;
-	flags->takeDamageInProgress = 0;
-	flags->takeDamageFinished = 1;
-	flags->animateSlap = 0;
-	flags->animateSlapInProgress = 0;
-	flags->animateSlapFinished = 1;
-	flags->GOBGoutside = 1;
-	flags->GOBGinside = 0;
 
 	running = true;
 }
@@ -198,7 +174,7 @@ void Game::input() {
 					if (flags->GOBGinside == 1) {
 						flags->inGameOver = 0;
 						flags->inStart = 0;
-						flags->playing = 1;
+						flags->playing = 0;
 						flags->GOBGinside = 0;
 					}
 					if (flags->GOBGinside == 3) {
@@ -438,11 +414,15 @@ void Game::render() {
 		}
 	}
 
-	if (!flags->playing && flags->inStart && !flags->inGameOver) start();
-
-	if (flags->playing && !flags->inStart && !flags->inGameOver) startGame();
-
-	if (LIMIT && !flags->playing && !flags->inStart && flags->inGameOver) gameOver();
+	bool inGameOver = LIMIT && !flags->playing && !flags->inStart && flags->inGameOver;
+	bool inStartMenu = !flags->playing && flags->inStart && !flags->inGameOver;
+	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver;
+	
+	std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << '\n';
+	//std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
+	if (inStartMenu) startMenu();
+	if (playAgain) startGame();
+	if (inGameOver) gameOver();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -452,16 +432,42 @@ bool Game::isGameOver() const {
 }
 
 void Game::startGame() {
+	//std::cout << "startGame" << '\n';
+	flags->playing = 1;
+	flags->inStart = 0;
+	flags->inGameOver = 0;
+	flags->poopInProgress = 0;
+	flags->poopFinished = 1;
+	flags->FXInProgress = 0;
+	flags->FXFinished = 1;
+	flags->isFXPoopFinished = 1;
+	flags->kindOfPoop = 0;
+	flags->takeDamage = 0;
+	flags->takeDamageInProgress = 0;
+	flags->takeDamageFinished = 1;
+	flags->animateSlap = 0;
+	flags->animateSlapInProgress = 0;
+	flags->animateSlapFinished = 1;
+	flags->GOBGoutside = 1;
+	flags->GOBGinside = 0;
+
+
+	if (Mix_PlayingMusic()) gameSounds->stopMusic();
+	gameSounds->playMusic();
+
+	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
 	gameTimer->startTimer();
-	std::cout << "meow" << '\n';
+
+	heartStates = { 1, 1, 1 };
 }
 
-void Game::start() {
-	std::cout << "arf" << '\n';
+void Game::startMenu() {
+	std::cout << "start" << '\n';
+	startGame();
 }
 
 void Game::gameOver() {
-	std::cout << "g o" << '\n';
+	//std::cout << "g o" << '\n';
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);
