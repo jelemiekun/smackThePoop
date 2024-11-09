@@ -18,7 +18,7 @@ void PoopBar::updateEachRectPoop() {
 
 		rect[i]->x = (((rectBorder->w / POOP_COUNT) * i) + BORDER_MARGIN) + rectBorder->x;
 		rect[i]->y = BORDER_MARGIN + rectBorder->y;
-		rect[i]->w = (rectBorder->w / POOP_COUNT) - BORDER_MARGIN + 4;
+		rect[i]->w = (rectBorder->w / POOP_COUNT) - BORDER_MARGIN;
 		rect[i]->h = rectBorder->h - (BORDER_MARGIN * 2);
 	}
 }
@@ -37,7 +37,6 @@ void PoopBar::init(SDL_Renderer* renderer) {
 	rectBorder->y = 0;
 
 	SDL_QueryTexture(mTexture, NULL, NULL, &rectBorder->w, &rectBorder->h);
-	rectBorder->w = rectBorder->w - BORDER_MARGIN;
 }
 
 void PoopBar::setXY(int x, int y) {
@@ -64,6 +63,10 @@ void PoopBar::render(SDL_Renderer* renderer) {
 	}
 
 	SDL_SetRenderTarget(renderer, nullptr);
+}
+
+void PoopBar::poopReleased() {
+	--poopRemaining;
 }
 
 void PoopBar::close() {

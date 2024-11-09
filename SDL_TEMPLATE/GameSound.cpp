@@ -73,9 +73,18 @@ void GameSound::loadSoundFX() {
 		std::cout << "Failed to load fx fart: " << Mix_GetError() << '\n';
 	else
 		std::cout << "FX fart loaded." << '\n';
+
+	Mix_VolumeChunk(gFXRelief, 100);
+	Mix_VolumeChunk(gFXGrunt, 100);
+	Mix_VolumeChunk(gFXHitPlayer, 124);
+	Mix_VolumeChunk(gFXHitPoop, 100);
+	Mix_VolumeChunk(gFXPoopStart, 100);
+	Mix_VolumeChunk(gFXPoopEnd, 70);
+	Mix_VolumeChunk(gFXFart, 70);
 }
 
 void GameSound::playMusic() {
+	Mix_VolumeMusic(35);
 	Mix_FadeInMusic(gMusic, -1, 5000);
 }
 

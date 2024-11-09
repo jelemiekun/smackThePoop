@@ -16,3 +16,17 @@ constexpr int FONT_SIZE = 28;
 constexpr auto PRIMARY_BUTTON = SDLK_RETURN;
 constexpr auto LEFT_BUTTON = SDLK_j;
 constexpr auto RIGHT_BUTTON = SDLK_k;
+
+constexpr bool LIMIT = false;
+
+constexpr int ALLOWANCE_TIME_TO_PLAY_POOP_END = 500;
+constexpr int ALLOWANCE_TIME_TO_CLICK_PLAYER = 500;
+constexpr int ALLOWANCE_TIME_GAMEPLAY = 120000;
+
+constexpr int DMG_FRAME_COUNT = 20;
+
+constexpr int POOP_COUNT = 15;
+
+constexpr int POOPFART_ANIMATION_PARTS = 6;
+constexpr int POOPFART_FRAMES_PER_ANIMATION = 8;
+constexpr int POOPFART_EACH_FRAME_DURATION = 6;

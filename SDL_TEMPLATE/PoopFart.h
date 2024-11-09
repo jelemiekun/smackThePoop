@@ -7,15 +7,12 @@ struct ToRelease {
 
 class PoopFart : public GameImage {
 private:
-	static constexpr int ANIMATION_PARTS = 6;
-	static constexpr int FRAMES_PER_ANIMATION = 8;
-	static constexpr int EACH_FRAME_DURATION = 6;
 	int frameCount;
 	bool finishRendering;
 	int widthEachSprite;
 	int heightEachSprite;
 
-	SDL_Rect* rectArrays[ANIMATION_PARTS][FRAMES_PER_ANIMATION];
+	SDL_Rect* rectArrays[POOPFART_ANIMATION_PARTS][POOPFART_FRAMES_PER_ANIMATION];
 	SDL_Rect* dstRect;
 
 	ToRelease* toRelease;

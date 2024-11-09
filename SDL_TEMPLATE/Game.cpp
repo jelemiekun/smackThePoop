@@ -77,7 +77,7 @@ void Game::init() {
 	gameSounds->loadSoundFX();
 
 	gameTimer = new Timer;
-	gameTimer->setStartingTime(20000);
+	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
 	gameTimer->startTimer();
 
 	poopFXTimer = new Timer;
@@ -247,10 +247,10 @@ void Game::update() {
 
 		flags->FXInProgress = 0;
 
-		poopFXTimer->setStartingTime(500);
+		poopFXTimer->setStartingTime(ALLOWANCE_TIME_TO_PLAY_POOP_END);
 		poopFXTimer->startTimer();
 
-		poopClickTimer->setStartingTime(500);
+		poopClickTimer->setStartingTime(ALLOWANCE_TIME_TO_CLICK_PLAYER);
 		poopClickTimer->startTimer();
 
 	}
@@ -263,6 +263,9 @@ void Game::update() {
 	}
 
 	if (flags->takeDamage && flags->takeDamageInProgress) {
+		gameSounds->setSoundFX(ClassSoundFXState::hitPlayer);
+		gameSounds->playSoundFX();
+
 		if (heartStates.heart3) {
 			heartStates.heart3 = 0;
 		} else {
@@ -273,7 +276,9 @@ void Game::update() {
 	}
 
 	if (flags->animateSlap && flags->animateSlapInProgress) {
-		std::cout << "nice!" << '\n';
+		gameSounds->setSoundFX(ClassSoundFXState::hitPoop);
+		gameSounds->playSoundFX();
+
 		flags->animateSlapInProgress = 0;
 	}
 
@@ -312,18 +317,21 @@ void Game::render() {
 	imgHeart2->render(gRenderer, &heart2, heartStates.heart2);
 	imgHeart3->render(gRenderer, &heart3, heartStates.heart3);
 
-	
-	character->animate(gRenderer, flags->takeDamage);
-
 	SDL_Color black = { 0, 0, 0, 255 };
 	textTimer->loadFromRenderedText(gRenderer, gameTimer->getTimeInFormat(), black, timerRect );
 
+	character->animate(gRenderer, flags->takeDamage);
 	poopBar->render(gRenderer);
 
 	if (flags->poopInProgress) {
 		poopFart->render(gRenderer);
 
 		if (poopFart->isFinishRendering()) {
+			if (flags->poopInProgress && flags->kindOfPoop == 0 &&
+				!flags->takeDamage && !flags->animateSlap) {
+				poopBar->poopReleased();
+			}
+
 			flags->poopInProgress = 0;
 			flags->poopFinished = 1;
 			flags->isFXPoopFinished = 1;
@@ -336,12 +344,15 @@ void Game::render() {
 		}
 	}
 
+
 	SDL_RenderPresent(gRenderer);
 
-	flags->playing = !gameTimer->isFinish();
-	flags->playing = !isGameOver();
+	if (LIMIT) {
+		flags->playing = !gameTimer->isFinish();
+		flags->playing = !isGameOver();
 
-	if (!flags->playing) gameTimer->stopTimer();
+		if (!flags->playing) gameTimer->stopTimer();
+	}
 }
 
 bool Game::isGameOver() const {
