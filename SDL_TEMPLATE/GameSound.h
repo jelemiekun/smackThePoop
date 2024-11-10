@@ -46,8 +46,10 @@ public:
 	void loadMusics();
 	void setMusic(ClassMusic music);
 	void playMusic();
+	void setMusicVolume(uint8_t volume);
 	void stopMusic();
 	void setSoundFX(ClassSoundFXState state);
+	void setsfxVolume(uint8_t volume);
 	void playSoundFX();
 	void close();
 };

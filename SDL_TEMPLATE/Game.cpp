@@ -4,7 +4,7 @@
 
 Game::Game() : gWindow(nullptr), running(false), 
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
-				imgHeart3(nullptr), imgStartBG(nullptr),
+				imgHeart3(nullptr), imgStartBG(nullptr), timerRect(nullptr),
 				controller1(nullptr), gameSounds(nullptr),
 				character(nullptr), gFontTimer(nullptr), textTimer(nullptr),
 				gameTimer(nullptr), poopBar(nullptr), poopFart(nullptr), flags(nullptr),
