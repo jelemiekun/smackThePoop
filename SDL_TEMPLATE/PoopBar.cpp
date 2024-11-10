@@ -69,6 +69,10 @@ void PoopBar::poopReleased() {
 	--poopRemaining;
 }
 
+void PoopBar::resetPoopBar() {
+	poopRemaining = POOP_COUNT;
+}
+
 void PoopBar::close() {
 	SDL_DestroyTexture(mTexture);
 	delete rectBorder;

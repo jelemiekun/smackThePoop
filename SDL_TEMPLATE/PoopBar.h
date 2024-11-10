@@ -20,6 +20,7 @@ public:
 	void setXY(int x, int y);
 	void render(SDL_Renderer* renderer);
 	void poopReleased();
+	void resetPoopBar();
 	void close();
 
 };

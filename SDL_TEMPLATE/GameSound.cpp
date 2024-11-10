@@ -154,7 +154,6 @@ void GameSound::close() {
 	Mix_FreeChunk(gFXPoopEnd);
 	Mix_FreeChunk(gFXFart);
 
-	Mix_FreeMusic(gMusicCurrent);
 	Mix_FreeMusic(gMusicStartMenu);
 	Mix_FreeMusic(gMusicPlaying);
 	Mix_FreeMusic(gMusicGameOver);

@@ -14,6 +14,19 @@ Game::Game() : gWindow(nullptr), running(false),
 
 Game::~Game() {}
 
+void Game::initIcon() {
+	std::string path = "assets/img/app.ico";
+	SDL_Surface* iconSurface = IMG_Load(path.c_str());
+
+	if (iconSurface == nullptr) {
+		std::cout << "Failed to load icon: " << IMG_GetError() << '\n';
+		return;
+	}
+
+	SDL_SetWindowIcon(gWindow, iconSurface);
+	SDL_FreeSurface(iconSurface);
+}
+
 void Game::init() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		std::cout << "Failed to initialize SDL subsystems: " << SDL_GetError() << '\n';
@@ -60,6 +73,8 @@ void Game::init() {
 		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
 	else
 		std::cout << "Font yubold loaded." << '\n';
+
+	initIcon();
 
 	textTimer = new Text;
 	textTimer->setGFont(gFontTimer);
@@ -252,7 +267,7 @@ void Game::input() {
 					} else {
 						flags->SMoutside = 0;
 
-						if (!SMoutsidePlay) { flags->SMinPlay = 1; flags->SMinSett = 0; flags->SMinQuit = 0; std::cout << "meow" << '\n'; }
+						if (!SMoutsidePlay) { flags->SMinPlay = 1; flags->SMinSett = 0; flags->SMinQuit = 0; }
 						if (!SMoutsideSett) { flags->SMinPlay = 0; flags->SMinSett = 1; flags->SMinQuit = 0; }
 						if (!SMoutsideQuit) { flags->SMinPlay = 0; flags->SMinSett = 0; flags->SMinQuit = 1; }
 					}
@@ -499,7 +514,9 @@ void Game::render() {
 		//  If currently playing, check if game is finished 
 		if (flags->playing && !flags->inStart && !flags->inGameOver) {
 			flags->playing = !gameTimer->isFinish(); // Toggle off if timer runs out
-			flags->playing = !isGameOver(); // Toggle off if no hearts left
+
+			if (flags->playing)
+				flags->playing = !isGameOver(); // Toggle off if no hearts left
 
 			// If playing is toggled off, go to game over and stop the timer
 			if (!flags->playing) {
@@ -514,8 +531,8 @@ void Game::render() {
 	bool inStartMenu = !flags->playing && flags->inStart && !flags->inGameOver;
 	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver;
 	
-	std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << '\n';
-	//std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
+	// std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << '\n';
+	// std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
 	if (inStartMenu) startMenu();
 	if (playAgain) startGame();
 	if (inGameOver) gameOver();
@@ -561,10 +578,13 @@ void Game::startMenu() {
 		heartStates = { 1, 1, 1 };
 
 		gameTimer->resetTimer();
-		gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
+		gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY + 500);
 		gameTimer->startTimer();
 		gameTimer->getTimeInFormat();
 		gameTimer->stopTimer();
+
+		poopBar->resetPoopBar();
+		poopBar->render(gRenderer);
 	}
 
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
