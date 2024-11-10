@@ -205,8 +205,10 @@ void Game::input() {
 	bool GOBGoutsideYes;
 	bool GOBGoutsideNo;
 
-	int x;
-	int y;
+	int x = 0;
+	int y = 0;
+
+	SDL_GetMouseState(&x, &y);
 
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT) {
@@ -573,6 +575,8 @@ void Game::startGame() {
 	gameTimer->startTimer();
 
 	heartStates = { 1, 1, 1 };
+
+	poopBar->resetPoopBar();
 }
 
 void Game::startMenu() {
