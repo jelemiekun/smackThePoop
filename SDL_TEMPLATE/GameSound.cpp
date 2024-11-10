@@ -34,6 +34,12 @@ void GameSound::loadMusics() {
 	if (gMusicGameOver == nullptr)
 		std::cout << "Failed to load the music: " << Mix_GetError() << '\n';
 	else std::cout << "Music game over loaded" << '\n';
+
+	gMusicWin = Mix_LoadMUS("assets/music/win.mp3");
+
+	if (gMusicWin == nullptr)
+		std::cout << "Failed to load the music: " << Mix_GetError() << '\n';
+	else std::cout << "Music win loaded" << '\n';
 }
 
 void GameSound::loadSoundFX() {
@@ -100,6 +106,7 @@ void GameSound::setMusic(ClassMusic music) {
 	case ClassMusic::startMenu:	gMusicCurrent = gMusicStartMenu; break;
 	case ClassMusic::playing: gMusicCurrent = gMusicPlaying; break;
 	case ClassMusic::gameOver: gMusicCurrent = gMusicGameOver;  break;
+	case ClassMusic::win: gMusicCurrent = gMusicWin; break;
 	default: break;
 	}
 }
@@ -154,6 +161,7 @@ void GameSound::close() {
 	Mix_FreeChunk(gFXPoopEnd);
 	Mix_FreeChunk(gFXFart);
 
+	Mix_FreeMusic(gMusicWin);
 	Mix_FreeMusic(gMusicStartMenu);
 	Mix_FreeMusic(gMusicPlaying);
 	Mix_FreeMusic(gMusicGameOver);

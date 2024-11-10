@@ -94,5 +94,8 @@
     <ClInclude Include="PoopFart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="InputFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

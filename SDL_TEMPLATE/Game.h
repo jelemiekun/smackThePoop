@@ -62,6 +62,7 @@ private:
 	void startGame();
 	void restartFlags();
 	void initIcon();
+	void resetMouseflags();
 
 public:
 	Game();

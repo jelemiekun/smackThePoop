@@ -161,11 +161,15 @@ void Game::init() {
 	flags->inGameOver = 0;
 	flags->inStart = 1;
 
+	flags->win = 0;
+
 	flags->readyToChangeMusic = 0;
 	
 	flags->SMinPlayClick = 0;
 	flags->SMinSettClick = 0;
 	flags->SMinQuitClick = 0;
+
+	resetMouseflags();
 
 	gameTimer->resetTimer();
 	gameTimer->setStartingTime(ALLOWANCE_TIME_GAMEPLAY);
@@ -194,16 +198,16 @@ void Game::input() {
 	static constexpr SDL_Rect SMS2 = { 134 + 48, 398 - 58, 284, 56 };
 	static constexpr SDL_Rect SMQ1 = { 243, 426, 169, 86 };
 	static constexpr SDL_Rect SMQ2 = { 228, 442, 200, 55 };
-	bool SMoutsidePlay;
-	bool SMoutsideSett;
-	bool SMoutsideQuit;
+	bool SMoutsidePlay = true;
+	bool SMoutsideSett = true;
+	bool SMoutsideQuit = true;
 
 	static constexpr SDL_Rect GOBGyesR1 = { 141, 380, 146, 90 };
 	static constexpr SDL_Rect GOBGyesR2 = { 133, 398, 163, 56 };
 	static constexpr SDL_Rect GOBGnoR1 = { 141 + 221, 380, 146, 90 };
 	static constexpr SDL_Rect GOBGnoR2 = { 133 + 221, 398, 163, 56 };
-	bool GOBGoutsideYes;
-	bool GOBGoutsideNo;
+	bool GOBGoutsideYes = true;
+	bool GOBGoutsideNo = true;
 
 	int x = 0;
 	int y = 0;
@@ -221,8 +225,8 @@ void Game::input() {
 					x = event.motion.x;
 					y = event.motion.y;
 
-					GOBGoutsideYes = x < GOBGyesR1.x || x > GOBGyesR1.x + GOBGyesR1.w || y < GOBGyesR1.y || y > GOBGyesR1.y + GOBGyesR1.h ||
-									x < GOBGyesR2.x || x > GOBGyesR2.x + GOBGyesR2.w || y < GOBGyesR2.y || y > GOBGyesR2.y + GOBGyesR2.h;
+					GOBGoutsideYes = (x < GOBGyesR1.x || x > GOBGyesR1.x + GOBGyesR1.w || y < GOBGyesR1.y || y > GOBGyesR1.y + GOBGyesR1.h) ||
+									(x < GOBGyesR2.x || x > GOBGyesR2.x + GOBGyesR2.w || y < GOBGyesR2.y || y > GOBGyesR2.y + GOBGyesR2.h);
 					GOBGoutsideNo = x < GOBGnoR1.x || x > GOBGnoR1.x + GOBGnoR1.w || y < GOBGnoR1.y || y > GOBGnoR1.y + GOBGnoR1.h ||
 									x < GOBGnoR2.x || x > GOBGnoR2.x + GOBGnoR2.w || y < GOBGnoR2.y || y > GOBGnoR2.y + GOBGnoR2.h;
 
@@ -236,22 +240,26 @@ void Game::input() {
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					if (flags->GOBGinside == 0) flags->GOBGinside = 1;
-					if (flags->GOBGinside == 2) flags->GOBGinside = 3;
+					if (event.button.button == SDL_BUTTON_LEFT && flags->GOBGoutside == 0) {
+						if (flags->GOBGinside == 0) flags->GOBGinside = 1;
+						if (flags->GOBGinside == 2) flags->GOBGinside = 3;
+					}
 					break;
 				case SDL_MOUSEBUTTONUP:
-					if (flags->GOBGinside == 1) {
-						flags->inGameOver = 0;
-						flags->inStart = 0;
-						flags->playing = 0;
-						flags->GOBGinside = 0;
-					}
-					if (flags->GOBGinside == 3) {
-						flags->inGameOver = 0;
-						flags->inStart = 1;
-						flags->playing = 0;
-						flags->GOBGinside = 2;
-						flags->readyToChangeMusic = 1;
+					if (event.button.button == SDL_BUTTON_LEFT && flags->GOBGoutside == 0) {
+						if (flags->GOBGinside == 1) {
+							flags->inGameOver = 0;
+							flags->inStart = 0;
+							flags->playing = 0;
+							flags->GOBGinside = 0;
+						}
+						if (flags->GOBGinside == 3) {
+							flags->inGameOver = 0;
+							flags->inStart = 1;
+							flags->playing = 0;
+							flags->GOBGinside = 2;
+							flags->readyToChangeMusic = 1;
+						}
 					}
 					break;
 				default:
@@ -284,20 +292,24 @@ void Game::input() {
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN: {
-					if (flags->SMinPlay) flags->SMinPlayClick = 1;
-					if (flags->SMinSett) flags->SMinSettClick = 1;
-					if (flags->SMinQuit) flags->SMinQuitClick = 1;
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						if (flags->SMinPlay) flags->SMinPlayClick = 1;
+						if (flags->SMinSett) flags->SMinSettClick = 1;
+						if (flags->SMinQuit) flags->SMinQuitClick = 1;
+					}
 				}
 					break;
 				case SDL_MOUSEBUTTONUP:
-					if (flags->SMinPlay) {
-						flags->SMinPlayClick = 0;
-						flags->playing = 0;
-						flags->inStart = 0;
-						flags->inGameOver = 0;
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						if (flags->SMinPlay) {
+							flags->SMinPlayClick = 0;
+							flags->playing = 0;
+							flags->inStart = 0;
+							flags->inGameOver = 0;
+						}
+						if (flags->SMinSett) flags->SMinSettClick = 0;
+						if (flags->SMinQuit) { flags->SMinQuitClick = 0; running = false; }
 					}
-					if (flags->SMinSett) flags->SMinSettClick = 0;
-					if (flags->SMinQuit) { flags->SMinQuitClick = 0; running = false; }
 				default:
 					break;
 				}
@@ -520,6 +532,18 @@ void Game::render() {
 		}
 	}
 
+	if (LIMIT && flags->playing && !flags->inGameOver && !flags->inStart) {
+		flags->win = poopBar->getPoopRemaining() == 0;
+
+		if (flags->win) {
+			gameTimer->stopTimer();
+			flags->playing = 0;
+			flags->inStart = 0;
+			flags->inGameOver = 1;
+			flags->readyToChangeMusic = 1;
+		}
+	}
+
 	// If LIMIT is toggled and not currently playing
 	if (LIMIT && !(!flags->playing && !flags->inGameOver && !flags->inStart)) {
 		//  If currently playing, check if game is finished 
@@ -652,10 +676,13 @@ void Game::gameOver() {
 	if (Mix_PlayingMusic() && flags->readyToChangeMusic) {
 		gameSounds->stopMusic();
 
-		gameSounds->setMusic(ClassMusic::gameOver);
+		if (flags->win) gameSounds->setMusic(ClassMusic::win);
+		else gameSounds->setMusic(ClassMusic::gameOver);
 		gameSounds->playMusic();
 
 		flags->readyToChangeMusic = 0;
+
+		resetMouseflags();
 	}
 
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
@@ -688,8 +715,13 @@ void Game::gameOver() {
 	imgGameOverBG->render(gRenderer, &gameOverDstRect);
 
 	SDL_Color blackGOBG = { 0, 0, 0, 255 };
-	SDL_Rect dstRectGameOver = { 145, 150 , 370, 150 };
-	textGameOver->loadFromRenderedText(gRenderer, "GAME OVER", blackGOBG, &dstRectGameOver);
+
+	SDL_Rect dstRectGameOver;
+	std::string message;
+
+	if (flags->win) { dstRectGameOver = { 140, 150 , 370, 150 }; message = "YOU WIN!"; }
+	else { dstRectGameOver = { 145, 150 , 370, 150 }; message = "GAME OVER"; }
+	textGameOver->loadFromRenderedText(gRenderer, message, blackGOBG, &dstRectGameOver);
 
 	SDL_Rect dstRectPlayAgain = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 3), (SCREEN_HEIGHT / 2) + 10,
 		350, 40 };
@@ -712,6 +744,13 @@ void Game::restartFlags() {
 	flags->animateSlap = 0;
 	flags->animateSlapInProgress = 0;
 	flags->animateSlapFinished = 1;
+	flags->readyToChangeMusic = 0;
+	flags->win = 0;
+
+	resetMouseflags();
+}
+
+void Game::resetMouseflags() {
 	flags->GOBGoutside = 1;
 	flags->GOBGinside = 0;
 	flags->SMoutside = 1;
@@ -721,7 +760,6 @@ void Game::restartFlags() {
 	flags->SMinPlayClick = 0;
 	flags->SMinSettClick = 0;
 	flags->SMinQuitClick = 0;
-	flags->readyToChangeMusic = 0;
 }
 
 void Game::close() {

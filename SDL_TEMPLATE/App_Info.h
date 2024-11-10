@@ -34,7 +34,7 @@ constexpr int POOPFART_FRAMES_PER_ANIMATION = 8;
 constexpr int POOPFART_EACH_FRAME_DURATION = 6;
 
 /*
-Abbreviations:
+Acronyms:
 SM - Start Menu 
 GOBG - Game Over Background
 R1 - Rectangle 1

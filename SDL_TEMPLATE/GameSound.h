@@ -14,7 +14,8 @@ enum class ClassSoundFXState {
 enum class ClassMusic {
 	startMenu,
 	playing,
-	gameOver
+	gameOver,
+	win
 };
 
 class GameSound {
@@ -24,6 +25,7 @@ private:
 	Mix_Music* gMusicStartMenu;
 	Mix_Music* gMusicPlaying;
 	Mix_Music* gMusicGameOver;
+	Mix_Music* gMusicWin;
 
 	Mix_Chunk* gFXRelief;
 	Mix_Chunk* gFXGrunt;

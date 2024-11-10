@@ -5,6 +5,8 @@ struct InputFlags {
 	unsigned int inStart : 1;
 	unsigned int inGameOver : 1;
 
+	unsigned int win : 1;
+
 	unsigned int poopInProgress : 1;
 	unsigned int poopFinished : 1;
 	unsigned int FXInProgress : 1;

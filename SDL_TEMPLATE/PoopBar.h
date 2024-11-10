@@ -21,6 +21,7 @@ public:
 	void render(SDL_Renderer* renderer);
 	void poopReleased();
 	void resetPoopBar();
+	uint8_t getPoopRemaining() const;
 	void close();
 
 };
