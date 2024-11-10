@@ -1,7 +1,7 @@
 #pragma once
 #include "SDL.h"
 
-constexpr const char* SCREEN_TITLE = "Save The Poop";
+constexpr const char* SCREEN_TITLE = "Smack The Poop";
 constexpr int SCREEN_X_POS = SDL_WINDOWPOS_CENTERED;
 constexpr int SCREEN_Y_POS = SDL_WINDOWPOS_CENTERED;
 constexpr Uint16 SCREEN_WIDTH = 640;
@@ -23,7 +23,7 @@ constexpr bool LIMIT = true;
 
 constexpr int ALLOWANCE_TIME_TO_PLAY_POOP_END = 500;
 constexpr int ALLOWANCE_TIME_TO_CLICK_PLAYER = 500;
-constexpr int ALLOWANCE_TIME_GAMEPLAY = 10000;
+constexpr int ALLOWANCE_TIME_GAMEPLAY = 120000;
 
 constexpr int DMG_FRAME_COUNT = 20;
 

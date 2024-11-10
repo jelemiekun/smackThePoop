@@ -41,6 +41,9 @@ private:
 	Text* textTimer;
 	Text* textGameOver;
 	Text* textPlayAgain;
+	Text* textSM1;
+	Text* textSM2;
+	Text* textSM3;
 	SDL_Rect* timerRect;
 	PoopBar* poopBar;
 	PoopFart* poopFart;

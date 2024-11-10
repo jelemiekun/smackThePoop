@@ -10,7 +10,7 @@ Game::Game() : gWindow(nullptr), running(false),
 				gameTimer(nullptr), poopBar(nullptr), poopFart(nullptr), flags(nullptr),
 				poopFXTimer(nullptr), poopClickTimer(nullptr), imgGameOverBG(nullptr),
 				textGameOver(nullptr), gFontGame(nullptr), gFontPlayAgain(nullptr),
-				textPlayAgain(nullptr) {}
+				textPlayAgain(nullptr), textSM1(nullptr), textSM2(nullptr), textSM3(nullptr) {}
 
 Game::~Game() {}
 
@@ -84,6 +84,15 @@ void Game::init() {
 
 	textPlayAgain = new Text;
 	textPlayAgain->setGFont(gFontPlayAgain);
+
+	textSM1 = new Text;
+	textSM1->setGFont(gFontPlayAgain);
+
+	textSM2 = new Text;
+	textSM2->setGFont(gFontPlayAgain);
+
+	textSM3 = new Text;
+	textSM3->setGFont(gFontPlayAgain);
 
 	imgBackground = new GameImage;
 	imgBackground->loadFromFile(gRenderer, "assets/img/background.png");
@@ -622,6 +631,17 @@ void Game::startMenu() {
 
 	imgStartBG->srcRect = &srcRect;
 	imgStartBG->render(gRenderer, &SMDstRect);
+
+	SDL_Color blackSM = { 0, 0, 0, 255 };
+	SDL_Rect dstRectSM1 = { 178, 100 , 280, 50 };
+	textSM1->loadFromRenderedText(gRenderer, "SMACK", blackSM, &dstRectSM1);
+
+	SDL_Rect dstRectSM2 = { 290, 145, 60, 20 };
+	textSM2->loadFromRenderedText(gRenderer, "THE", blackSM, &dstRectSM2);
+
+	SDL_Color brownSM = { 99, 51, 0, 255 };
+	SDL_Rect dstRectSM3 = { 180, 155 , 290, 60 };
+	textSM1->loadFromRenderedText(gRenderer, "P O O P", brownSM, &dstRectSM3);
 }
 
 void Game::gameOver() {
