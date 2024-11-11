@@ -26,6 +26,7 @@ private:
 	GameImage* imgBackground;
 	GameImage* imgGameOverBG;
 	GameImage* imgStartBG;
+	GameImage* imgSettingsBG;
 	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;
@@ -63,6 +64,7 @@ private:
 	void restartFlags();
 	void initIcon();
 	void resetMouseflags();
+	void settings();
 
 public:
 	Game();

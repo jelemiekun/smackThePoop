@@ -5,7 +5,7 @@
 Game::Game() : gWindow(nullptr), running(false), 
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
 				imgHeart3(nullptr), imgStartBG(nullptr), timerRect(nullptr),
-				controller1(nullptr), gameSounds(nullptr),
+				controller1(nullptr), gameSounds(nullptr), imgSettingsBG(nullptr),
 				character(nullptr), gFontTimer(nullptr), textTimer(nullptr),
 				gameTimer(nullptr), poopBar(nullptr), poopFart(nullptr), flags(nullptr),
 				poopFXTimer(nullptr), poopClickTimer(nullptr), imgGameOverBG(nullptr),
@@ -103,6 +103,10 @@ void Game::init() {
 	imgStartBG = new GameImage;
 	imgStartBG->loadFromFile(gRenderer, "assets/img/startMenuBG.png");
 
+
+	imgSettingsBG = new GameImage;
+	imgSettingsBG->loadFromFile(gRenderer, "assets/img/settingsBG.png");
+
 	imgHeart1 = new Heart;
 	imgHeart1->loadFromFile(gRenderer, "assets/img/heart.png");
 	imgHeart1->getSrcRect()->w = imgHeart1->getSrcRect()->w / 2;
@@ -160,6 +164,7 @@ void Game::init() {
 	flags->playing = 0;
 	flags->inGameOver = 0;
 	flags->inStart = 1;
+	flags->inSettings = 0;
 
 	flags->win = 0;
 
@@ -218,8 +223,12 @@ void Game::input() {
 		if (event.type == SDL_QUIT) {
 			running = false;
 		} else {
+			if (!flags->inGameOver && !flags->playing && !flags->inStart && flags->inSettings) {
+
+			}
+
 			// if in game over menu
-			if (LIMIT && flags->inGameOver && !flags->playing && !flags->inStart) {
+			if (LIMIT && flags->inGameOver && !flags->playing && !flags->inStart && !flags->inSettings) {
 				switch (event.type) {
 				case SDL_MOUSEMOTION:
 					x = event.motion.x;
@@ -247,16 +256,20 @@ void Game::input() {
 					break;
 				case SDL_MOUSEBUTTONUP:
 					if (event.button.button == SDL_BUTTON_LEFT && flags->GOBGoutside == 0) {
+						// Play again after game over
 						if (flags->GOBGinside == 1) {
 							flags->inGameOver = 0;
 							flags->inStart = 0;
 							flags->playing = 0;
+							flags->inSettings = 0;
 							flags->GOBGinside = 0;
 						}
+						// After game over, go to start menu
 						if (flags->GOBGinside == 3) {
 							flags->inGameOver = 0;
 							flags->inStart = 1;
 							flags->playing = 0;
+							flags->inSettings = 0;
 							flags->GOBGinside = 2;
 							flags->readyToChangeMusic = 1;
 						}
@@ -268,7 +281,7 @@ void Game::input() {
 			}
 
 			// if in start menu
-			if (LIMIT && !flags->inGameOver && !flags->playing && flags->inStart) {
+			if (LIMIT && !flags->inGameOver && !flags->playing && flags->inStart && !flags->inSettings) {
 				switch (event.type) {
 				case SDL_MOUSEMOTION:
 					x = event.motion.x;
@@ -293,21 +306,31 @@ void Game::input() {
 					break;
 				case SDL_MOUSEBUTTONDOWN: {
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						if (flags->SMinPlay) flags->SMinPlayClick = 1;
-						if (flags->SMinSett) flags->SMinSettClick = 1;
-						if (flags->SMinQuit) flags->SMinQuitClick = 1;
+						if (flags->SMinPlay) flags->SMinPlayClick = 1; // If play is beging clicked
+						if (flags->SMinSett) flags->SMinSettClick = 1; // If settings is beging clicked
+						if (flags->SMinQuit) flags->SMinQuitClick = 1; // If quit is beging clicked
 					}
 				}
 					break;
 				case SDL_MOUSEBUTTONUP:
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						if (flags->SMinPlay) {
+							// From start menu, play
 							flags->SMinPlayClick = 0;
 							flags->playing = 0;
 							flags->inStart = 0;
 							flags->inGameOver = 0;
+							flags->inSettings = 0;
 						}
-						if (flags->SMinSett) flags->SMinSettClick = 0;
+						if (flags->SMinSett) {
+							// From start menu, go to settings
+							flags->SMinSettClick = 0;
+							flags->playing = 0;
+							flags->inStart = 0;
+							flags->inGameOver = 0;
+							flags->inSettings = 1;
+						}
+						// Quit
 						if (flags->SMinQuit) { flags->SMinQuitClick = 0; running = false; }
 					}
 				default:
@@ -316,7 +339,7 @@ void Game::input() {
 			}
 
 			// if playing
-			if (LIMIT && flags->playing && !flags->inStart && !flags->inGameOver) {
+			if (LIMIT && flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings) {
 				switch (event.type) {
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym) {
@@ -407,7 +430,8 @@ void Game::input() {
 }
 
 void Game::update() {
-	if (flags->playing && !flags->inGameOver && !flags->inStart) {
+	// Handle inputs if currently playing
+	if (flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings) {
 		if (flags->FXInProgress && flags->poopInProgress) {
 			poopFart->generateRandomNumber();
 			int state = poopFart->getToReleaseState();
@@ -532,22 +556,25 @@ void Game::render() {
 		}
 	}
 
-	if (LIMIT && flags->playing && !flags->inGameOver && !flags->inStart) {
+	// If LIMIT is on while playing
+	if (LIMIT && flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings) {
 		flags->win = poopBar->getPoopRemaining() == 0;
 
+		// If player win
 		if (flags->win) {
 			gameTimer->stopTimer();
 			flags->playing = 0;
 			flags->inStart = 0;
 			flags->inGameOver = 1;
+			flags->inSettings = 0;
 			flags->readyToChangeMusic = 1;
 		}
 	}
 
 	// If LIMIT is toggled and not currently playing
-	if (LIMIT && !(!flags->playing && !flags->inGameOver && !flags->inStart)) {
+	if (LIMIT && !(!flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings)) {
 		//  If currently playing, check if game is finished 
-		if (flags->playing && !flags->inStart && !flags->inGameOver) {
+		if (flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings) {
 			flags->playing = !gameTimer->isFinish(); // Toggle off if timer runs out
 
 			if (flags->playing)
@@ -562,15 +589,17 @@ void Game::render() {
 		}
 	}
 
-	bool inGameOver = LIMIT && !flags->playing && !flags->inStart && flags->inGameOver;
-	bool inStartMenu = !flags->playing && flags->inStart && !flags->inGameOver;
-	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver;
+	bool inGameOver = LIMIT && !flags->playing && !flags->inStart && flags->inGameOver && !flags->inSettings;
+	bool inStartMenu = !flags->playing && flags->inStart && !flags->inGameOver && !flags->inSettings;
+	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings;
+	bool inSettings = !flags->playing && !flags->inStart && !flags->inGameOver && flags->inSettings;
 	
 	// std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << '\n';
 	// std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
 	if (inStartMenu) startMenu();
 	if (playAgain) startGame();
 	if (inGameOver) gameOver();
+	if (inSettings) settings();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -604,6 +633,7 @@ void Game::startGame() {
 }
 
 void Game::startMenu() {
+	std::cout << "meow" << '\n';
 	if (Mix_PlayingMusic() && flags->readyToChangeMusic) {
 		gameSounds->stopMusic();
 
@@ -728,10 +758,15 @@ void Game::gameOver() {
 	textPlayAgain->loadFromRenderedText(gRenderer, "DO YOU WANT TO PLAY AGAIN?", blackGOBG, &dstRectPlayAgain);
 }
 
+void Game::settings() {
+
+}
+
 void Game::restartFlags() {
 	flags->playing = 1;
 	flags->inStart = 0;
 	flags->inGameOver = 0;
+	flags->inSettings = 0;
 	flags->poopInProgress = 0;
 	flags->poopFinished = 1;
 	flags->FXInProgress = 0;

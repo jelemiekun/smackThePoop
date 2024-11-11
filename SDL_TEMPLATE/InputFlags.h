@@ -4,6 +4,7 @@ struct InputFlags {
 
 	unsigned int inStart : 1;
 	unsigned int inGameOver : 1;
+	unsigned int inSettings : 1;
 
 	unsigned int win : 1;
 
