@@ -10,7 +10,10 @@ Game::Game() : gWindow(nullptr), running(false),
 				gameTimer(nullptr), poopBar(nullptr), poopFart(nullptr), flags(nullptr),
 				poopFXTimer(nullptr), poopClickTimer(nullptr), imgGameOverBG(nullptr),
 				textGameOver(nullptr), gFontGame(nullptr), gFontPlayAgain(nullptr),
-				textPlayAgain(nullptr), textSM1(nullptr), textSM2(nullptr), textSM3(nullptr) {}
+				textPlayAgain(nullptr), textSM1(nullptr), textSM2(nullptr), textSM3(nullptr),
+				sliderHandleMusicVol(nullptr), sliderHandleSFXVol(nullptr), 
+				sliderMusicVol(nullptr), sliderSFXVol(nullptr), sliderMusicDragging(nullptr),
+				musicVolume(nullptr) {}
 
 Game::~Game() {}
 
@@ -126,13 +129,49 @@ void Game::init() {
 	controller1 = new GameController;
 	controller1->init();
 
+	musicVolume = new uint16_t;
+	*musicVolume = MIX_MAX_VOLUME / 2;
+
+	SFXVolume = new uint16_t;
+	*SFXVolume = MIX_MAX_VOLUME / 2;
+
 	gameSounds = new GameSound;
 	gameSounds->initMixer();
 	gameSounds->loadMusics();
 	gameSounds->loadSoundFX();
-
+	gameSounds->setFXsVolume(*SFXVolume);
 	gameSounds->setMusic(ClassMusic::startMenu);
 	gameSounds->playMusic();
+
+	sliderHandleMusicVol = new SDL_Rect;
+	sliderHandleMusicVol->x = 405;
+	sliderHandleMusicVol->y = 185;
+	sliderHandleMusicVol->w = 10;
+	sliderHandleMusicVol->h = 20;
+	
+	sliderMusicVol = new SDL_Rect;
+	sliderMusicVol->x = 340;
+	sliderMusicVol->y = 190;
+	sliderMusicVol->w = 150;
+	sliderMusicVol->h = 10;
+
+	sliderMusicDragging = new bool;
+	*sliderMusicDragging = false;
+
+	sliderHandleSFXVol = new SDL_Rect;
+	sliderHandleSFXVol->x = 405;
+	sliderHandleSFXVol->y = 235;
+	sliderHandleSFXVol->w = 10;
+	sliderHandleSFXVol->h = 20;
+
+	sliderSFXVol = new SDL_Rect;
+	sliderSFXVol->x = 340;
+	sliderSFXVol->y = 240;
+	sliderSFXVol->w = 150;
+	sliderSFXVol->h = 10;
+
+	sliderSFXDragging = new bool;
+	*sliderSFXDragging = false;
 
 	gameTimer = new Timer;
 
@@ -217,6 +256,8 @@ void Game::input() {
 	int x = 0;
 	int y = 0;
 
+	int volume = MIX_MAX_VOLUME / 2;
+
 	SDL_GetMouseState(&x, &y);
 
 	while (SDL_PollEvent(&event)) {
@@ -224,7 +265,57 @@ void Game::input() {
 			running = false;
 		} else {
 			if (!flags->inGameOver && !flags->playing && !flags->inStart && flags->inSettings) {
+				if (event.type == SDL_MOUSEBUTTONDOWN) {
+					if (event.button.button == SDL_BUTTON_LEFT &&
+						event.button.x >= sliderHandleSFXVol->x && event.button.x <= sliderHandleSFXVol->x + sliderHandleSFXVol->w &&
+						event.button.y >= sliderHandleSFXVol->y && event.button.y <= sliderHandleSFXVol->y + sliderHandleSFXVol->h) {
+						*sliderSFXDragging = true;  // Start dragging if mouse is down inside music slider handle
+					}
+					if (event.button.button == SDL_BUTTON_LEFT &&
+						event.button.x >= sliderHandleMusicVol->x && event.button.x <= sliderHandleMusicVol->x + sliderHandleMusicVol->w &&
+						event.button.y >= sliderHandleMusicVol->y && event.button.y <= sliderHandleMusicVol->y + sliderHandleMusicVol->h) {
+						*sliderMusicDragging = true;  // Start dragging if mouse is down inside music slider handle
+					}
+				} else if (event.type == SDL_MOUSEBUTTONUP) {
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						*sliderMusicDragging = false;  // Stop dragging on mouse up music handle
+						*sliderSFXDragging = false;  // Stop dragging on mouse up SFX handle
+					}
+				} else if (event.type == SDL_MOUSEMOTION) {
+					if (*sliderMusicDragging) {
+						// Move the music slider handle with the mouse
+						sliderHandleMusicVol->x = event.motion.x - sliderHandleMusicVol->w / 2;
 
+						// Constrain the music handle to the slider track
+						if (sliderHandleMusicVol->x < sliderMusicVol->x) {
+							sliderHandleMusicVol->x = sliderMusicVol->x;
+						} else if (sliderHandleMusicVol->x > sliderMusicVol->x + sliderMusicVol->w - sliderHandleMusicVol->w) {
+							sliderHandleMusicVol->x = sliderMusicVol->x + sliderMusicVol->w - sliderHandleMusicVol->w;
+						}
+
+						// Map music handle position to volume range (0 to MIX_MAX_VOLUME)
+						volume = (sliderHandleMusicVol->x - sliderMusicVol->x) * MIX_MAX_VOLUME / (sliderMusicVol->w - sliderHandleMusicVol->w);
+
+						// Set the music volume
+						Mix_VolumeMusic(volume);
+					}
+					if (*sliderSFXDragging) {
+						// Move the music slider handle with the mouse
+						sliderHandleSFXVol->x = event.motion.x - sliderHandleSFXVol->w / 2;
+
+						// Constrain the music handle to the slider track
+						if (sliderHandleSFXVol->x < sliderSFXVol->x) {
+							sliderHandleSFXVol->x = sliderSFXVol->x;
+						} else if (sliderHandleSFXVol->x > sliderSFXVol->x + sliderSFXVol->w - sliderHandleSFXVol->w) {
+							sliderHandleSFXVol->x = sliderSFXVol->x + sliderSFXVol->w - sliderHandleSFXVol->w;
+						}
+
+						// Map music handle position to volume range (0 to MIX_MAX_VOLUME)
+						volume = (sliderHandleSFXVol->x - sliderSFXVol->x) * MIX_MAX_VOLUME / (sliderSFXVol->w - sliderHandleSFXVol->w);
+						
+						gameSounds->setFXsVolume(volume);
+					}
+				}
 			}
 
 			// if in game over menu
@@ -633,7 +724,6 @@ void Game::startGame() {
 }
 
 void Game::startMenu() {
-	std::cout << "meow" << '\n';
 	if (Mix_PlayingMusic() && flags->readyToChangeMusic) {
 		gameSounds->stopMusic();
 
@@ -759,6 +849,36 @@ void Game::gameOver() {
 }
 
 void Game::settings() {
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
+	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);
+	SDL_Rect whiteTransparent = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	SDL_RenderFillRect(gRenderer, &whiteTransparent);
+
+	int wSETT = 0;
+	int hSETT = 0;
+
+	SDL_QueryTexture(imgSettingsBG->mTexture, NULL, NULL, &wSETT, &hSETT);
+
+	SDL_Rect srcRect = { (wSETT / 2) * 0, 0, wSETT / 2, hSETT };
+
+	if (flags->SETinBack) srcRect.x = (wSETT / 2) * 1;
+
+	SDL_Rect settingsDstRect = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 5, (SCREEN_HEIGHT / 2) - (hSETT / 3) - 30,
+	500, 500 };
+
+	imgSettingsBG->srcRect = &srcRect;
+	imgSettingsBG->render(gRenderer, &settingsDstRect);
+
+	// Draw sliders background
+	SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
+	SDL_RenderFillRect(gRenderer, sliderMusicVol);
+	SDL_RenderFillRect(gRenderer, sliderSFXVol);
+
+	// Draw sliders handle
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(gRenderer, sliderHandleMusicVol);
+	SDL_RenderFillRect(gRenderer, sliderHandleSFXVol);
 
 }
 
@@ -781,6 +901,7 @@ void Game::restartFlags() {
 	flags->animateSlapFinished = 1;
 	flags->readyToChangeMusic = 0;
 	flags->win = 0;
+	flags->SETinBack = 0;
 
 	resetMouseflags();
 }

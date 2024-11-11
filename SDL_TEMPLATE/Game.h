@@ -48,6 +48,14 @@ private:
 	SDL_Rect* timerRect;
 	PoopBar* poopBar;
 	PoopFart* poopFart;
+	SDL_Rect* sliderHandleMusicVol;
+	SDL_Rect* sliderMusicVol;
+	bool* sliderMusicDragging;
+	uint16_t* musicVolume;
+	SDL_Rect* sliderHandleSFXVol;
+	SDL_Rect* sliderSFXVol;
+	bool* sliderSFXDragging;
+	uint16_t* SFXVolume;
 	
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/

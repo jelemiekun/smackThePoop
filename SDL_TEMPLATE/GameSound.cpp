@@ -115,22 +115,12 @@ void GameSound::playMusic() {
 	Mix_FadeInMusic(gMusicCurrent, -1, 1500);
 }
 
-void GameSound::setMusicVolume(uint8_t volume) {
-	int scaledVolume = std::round(((volume - 1) / 99.0) * 127 + 1);
-	Mix_VolumeMusic(scaledVolume);
-}
-
 void GameSound::stopMusic() {
 	Mix_FadeOutMusic(1000);
 }
 
 void GameSound::setSoundFX(ClassSoundFXState state) {
 	FXState = state;
-}
-
-void GameSound::setsfxVolume(uint8_t volume) {
-	int scaledVolume = std::round(((volume - 1) / 99.0) * 127 + 1);
-	Mix_VolumeMusic(scaledVolume);
 }
 
 void GameSound::playSoundFX() {
@@ -159,6 +149,16 @@ void GameSound::playSoundFX() {
 	default:
 		break;
 	}
+}
+
+void GameSound::setFXsVolume(const uint16_t& volume) {
+	Mix_VolumeChunk(gFXRelief, volume);
+	Mix_VolumeChunk(gFXGrunt, volume);
+	Mix_VolumeChunk(gFXHitPlayer, volume);
+	Mix_VolumeChunk(gFXHitPoop, volume);
+	Mix_VolumeChunk(gFXPoopStart, volume);
+	Mix_VolumeChunk(gFXPoopEnd, volume);
+	Mix_VolumeChunk(gFXFart, volume);
 }
 
 void GameSound::close() {
