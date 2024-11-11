@@ -256,7 +256,9 @@ void Game::input() {
 	int x = 0;
 	int y = 0;
 
+	static constexpr SDL_Rect SETTBack = { 122, 108, 68, 40 };
 	int volume = MIX_MAX_VOLUME / 2;
+	bool SETToutsideBack = true;
 
 	SDL_GetMouseState(&x, &y);
 
@@ -264,24 +266,17 @@ void Game::input() {
 		if (event.type == SDL_QUIT) {
 			running = false;
 		} else {
+
+			// If in settings
 			if (!flags->inGameOver && !flags->playing && !flags->inStart && flags->inSettings) {
-				if (event.type == SDL_MOUSEBUTTONDOWN) {
-					if (event.button.button == SDL_BUTTON_LEFT &&
-						event.button.x >= sliderHandleSFXVol->x && event.button.x <= sliderHandleSFXVol->x + sliderHandleSFXVol->w &&
-						event.button.y >= sliderHandleSFXVol->y && event.button.y <= sliderHandleSFXVol->y + sliderHandleSFXVol->h) {
-						*sliderSFXDragging = true;  // Start dragging if mouse is down inside music slider handle
-					}
-					if (event.button.button == SDL_BUTTON_LEFT &&
-						event.button.x >= sliderHandleMusicVol->x && event.button.x <= sliderHandleMusicVol->x + sliderHandleMusicVol->w &&
-						event.button.y >= sliderHandleMusicVol->y && event.button.y <= sliderHandleMusicVol->y + sliderHandleMusicVol->h) {
-						*sliderMusicDragging = true;  // Start dragging if mouse is down inside music slider handle
-					}
-				} else if (event.type == SDL_MOUSEBUTTONUP) {
-					if (event.button.button == SDL_BUTTON_LEFT) {
-						*sliderMusicDragging = false;  // Stop dragging on mouse up music handle
-						*sliderSFXDragging = false;  // Stop dragging on mouse up SFX handle
-					}
-				} else if (event.type == SDL_MOUSEMOTION) {
+				if (event.type == SDL_MOUSEMOTION) {
+					x = event.motion.x;
+					y = event.motion.y;
+
+					SETToutsideBack = x < SETTBack.x || x > SETTBack.x + SETTBack.w || y < SETTBack.y || y > SETTBack.y + SETTBack.h;
+
+					flags->SETinBack = !SETToutsideBack;
+
 					if (*sliderMusicDragging) {
 						// Move the music slider handle with the mouse
 						sliderHandleMusicVol->x = event.motion.x - sliderHandleMusicVol->w / 2;
@@ -312,8 +307,35 @@ void Game::input() {
 
 						// Map music handle position to volume range (0 to MIX_MAX_VOLUME)
 						volume = (sliderHandleSFXVol->x - sliderSFXVol->x) * MIX_MAX_VOLUME / (sliderSFXVol->w - sliderHandleSFXVol->w);
-						
+
 						gameSounds->setFXsVolume(volume);
+					}
+				} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+					if (event.button.button == SDL_BUTTON_LEFT &&
+						event.button.x >= sliderHandleSFXVol->x && event.button.x <= sliderHandleSFXVol->x + sliderHandleSFXVol->w &&
+						event.button.y >= sliderHandleSFXVol->y && event.button.y <= sliderHandleSFXVol->y + sliderHandleSFXVol->h) {
+						*sliderSFXDragging = true;  // Start dragging if mouse is down inside music slider handle
+					}
+					if (event.button.button == SDL_BUTTON_LEFT &&
+						event.button.x >= sliderHandleMusicVol->x && event.button.x <= sliderHandleMusicVol->x + sliderHandleMusicVol->w &&
+						event.button.y >= sliderHandleMusicVol->y && event.button.y <= sliderHandleMusicVol->y + sliderHandleMusicVol->h) {
+						*sliderMusicDragging = true;  // Start dragging if mouse is down inside music slider handle
+					}
+				} else if (event.type == SDL_MOUSEBUTTONUP) {
+					if (flags->SETinBack) {
+						std::cout << "meow" << '\n';
+						flags->inGameOver = 0;
+						flags->inStart = 1;
+						flags->playing = 0;
+						flags->inSettings = 0;
+					}
+
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						// From settings, go to start menu
+						
+
+						*sliderMusicDragging = false;  // Stop dragging on mouse up music handle
+						*sliderSFXDragging = false;  // Stop dragging on mouse up SFX handle
 					}
 				}
 			}
@@ -408,6 +430,7 @@ void Game::input() {
 						if (flags->SMinPlay) {
 							// From start menu, play
 							flags->SMinPlayClick = 0;
+							flags->SMinSett = 0;
 							flags->playing = 0;
 							flags->inStart = 0;
 							flags->inGameOver = 0;
@@ -416,10 +439,12 @@ void Game::input() {
 						if (flags->SMinSett) {
 							// From start menu, go to settings
 							flags->SMinSettClick = 0;
+							flags->SMinSett = 0;
 							flags->playing = 0;
 							flags->inStart = 0;
 							flags->inGameOver = 0;
 							flags->inSettings = 1;
+							flags->SETinBack = 0;
 						}
 						// Quit
 						if (flags->SMinQuit) { flags->SMinQuitClick = 0; running = false; }
@@ -685,7 +710,7 @@ void Game::render() {
 	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings;
 	bool inSettings = !flags->playing && !flags->inStart && !flags->inGameOver && flags->inSettings;
 	
-	// std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << '\n';
+	// std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << ", " << flags->inSettings << '\n';
 	// std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
 	if (inStartMenu) startMenu();
 	if (playAgain) startGame();
