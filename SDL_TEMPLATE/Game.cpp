@@ -13,7 +13,7 @@ Game::Game() : gWindow(nullptr), running(false),
 				textPlayAgain(nullptr), textSM1(nullptr), textSM2(nullptr), textSM3(nullptr),
 				sliderHandleMusicVol(nullptr), sliderHandleSFXVol(nullptr), 
 				sliderMusicVol(nullptr), sliderSFXVol(nullptr), sliderMusicDragging(nullptr),
-				musicVolume(nullptr) {}
+				musicVolume(nullptr), imgButtons(nullptr), prmryBtnOpacity(nullptr) {}
 
 Game::~Game() {}
 
@@ -109,6 +109,13 @@ void Game::init() {
 
 	imgSettingsBG = new GameImage;
 	imgSettingsBG->loadFromFile(gRenderer, "assets/img/settingsBG.png");
+
+	imgButtons = new GameImage;
+	imgButtons->loadFromFile(gRenderer, "assets/img/buttons.png");
+
+	prmryBtnOpacity = new uint8_t;
+	leftBtnOpacity = new uint8_t;
+	rightBtnOpacity = new uint8_t;
 
 	imgHeart1 = new Heart;
 	imgHeart1->loadFromFile(gRenderer, "assets/img/heart.png");
@@ -460,6 +467,7 @@ void Game::input() {
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym) {
 					case PRIMARY_BUTTON:
+						flags->clickedButtonPrmry = 1;
 						if (flags->poopFinished) {
 							flags->poopInProgress = 1;
 							flags->poopFinished = 0;
@@ -468,6 +476,7 @@ void Game::input() {
 						}
 						break;
 					case LEFT_BUTTON:
+						flags->clickedButtonLeft = 1;
 						if (flags->poopInProgress) {
 							if (poopClickTimer->isFinish()) {
 								flags->takeDamage = 1;
@@ -495,6 +504,7 @@ void Game::input() {
 						}
 						break;
 					case RIGHT_BUTTON:
+						flags->clickedButtonRight = 1;
 						if (flags->poopInProgress) {
 							if (poopClickTimer->isFinish()) {
 								flags->takeDamage = 1;
@@ -650,6 +660,10 @@ void Game::render() {
 
 	character->animate(gRenderer, flags->takeDamage);
 	poopBar->render(gRenderer);
+
+	if (*prmryBtnOpacity != 0) renderButtonPrmry();
+	if (*leftBtnOpacity != 0) renderButtonLeft();
+	if (*rightBtnOpacity != 0) renderButtonRight();
 
 	if (flags->poopInProgress) {
 		poopFart->render(gRenderer);
@@ -907,6 +921,70 @@ void Game::settings() {
 
 }
 
+void Game::renderButtonPrmry() {
+	if (flags->clickedButtonPrmry) {
+		int diff = 4;
+		*prmryBtnOpacity = (*prmryBtnOpacity - diff < 0) ? 0 : *prmryBtnOpacity - diff;
+	}
+
+	int wBTNPMRT = 0;
+	int hBTNPMRY = 0;
+
+	SDL_QueryTexture(imgButtons->mTexture, NULL, NULL, &wBTNPMRT, &hBTNPMRY);
+
+	SDL_Rect srcRect = { 0, (hBTNPMRY / 3) * 0, wBTNPMRT, hBTNPMRY / 3 };
+
+	SDL_Rect dstRect = { (SCREEN_WIDTH / 2) + 210, (SCREEN_HEIGHT / 2) - (hBTNPMRY / 5) - 3,
+	wBTNPMRT / 2 + 20, hBTNPMRY / 3 };
+
+	imgButtons->srcRect = &srcRect;
+	SDL_SetTextureAlphaMod(imgButtons->mTexture, *prmryBtnOpacity);
+	imgButtons->render(gRenderer, &dstRect);
+}
+
+void Game::renderButtonLeft() {
+	if (flags->clickedButtonLeft) {
+		int diff = 4;
+		*leftBtnOpacity = (*leftBtnOpacity - diff < 0) ? 0 : *leftBtnOpacity - diff;
+	}
+
+	int wBTNPMRT = 0;
+	int hBTNPMRY = 0;
+
+	SDL_QueryTexture(imgButtons->mTexture, NULL, NULL, &wBTNPMRT, &hBTNPMRY);
+
+	SDL_Rect srcRect = { 0, (hBTNPMRY / 3) * 1, wBTNPMRT, hBTNPMRY / 3 };
+
+	// (SCREEN_WIDTH / 2) + 210, (SCREEN_HEIGHT / 2) - (hBTNPMRY / 5) + 120,
+	SDL_Rect dstRect = { (SCREEN_WIDTH / 2) - 260, (SCREEN_HEIGHT / 2) - (hBTNPMRY / 5) + 120,
+	wBTNPMRT / 2 + 20, hBTNPMRY / 3 };
+
+	imgButtons->srcRect = &srcRect;
+	SDL_SetTextureAlphaMod(imgButtons->mTexture, *leftBtnOpacity);
+	imgButtons->render(gRenderer, &dstRect);
+}
+
+void Game::renderButtonRight() {
+	if (flags->clickedButtonRight) {
+		int diff = 4;
+		*rightBtnOpacity = (*rightBtnOpacity - diff < 0) ? 0 : *rightBtnOpacity - diff;
+	}
+
+	int wBTNPMRT = 0;
+	int hBTNPMRY = 0;
+
+	SDL_QueryTexture(imgButtons->mTexture, NULL, NULL, &wBTNPMRT, &hBTNPMRY);
+
+	SDL_Rect srcRect = { 0, (hBTNPMRY / 3) * 2, wBTNPMRT, hBTNPMRY / 3 };
+
+	SDL_Rect dstRect = { (SCREEN_WIDTH / 2) + 210, (SCREEN_HEIGHT / 2) - (hBTNPMRY / 5) + 120,
+	wBTNPMRT / 2 + 20, hBTNPMRY / 3 };
+
+	imgButtons->srcRect = &srcRect;
+	SDL_SetTextureAlphaMod(imgButtons->mTexture, *rightBtnOpacity);
+	imgButtons->render(gRenderer, &dstRect);
+}
+
 void Game::restartFlags() {
 	flags->playing = 1;
 	flags->inStart = 0;
@@ -927,6 +1005,12 @@ void Game::restartFlags() {
 	flags->readyToChangeMusic = 0;
 	flags->win = 0;
 	flags->SETinBack = 0;
+	flags->clickedButtonPrmry = 0;
+	flags->clickedButtonLeft = 0;
+	flags->clickedButtonRight = 0;
+	*prmryBtnOpacity = 255;
+	*rightBtnOpacity = 255;
+	*leftBtnOpacity = 255;
 
 	resetMouseflags();
 }

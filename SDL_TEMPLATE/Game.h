@@ -27,6 +27,7 @@ private:
 	GameImage* imgGameOverBG;
 	GameImage* imgStartBG;
 	GameImage* imgSettingsBG;
+	GameImage* imgButtons;
 	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;
@@ -56,6 +57,9 @@ private:
 	SDL_Rect* sliderSFXVol;
 	bool* sliderSFXDragging;
 	uint16_t* SFXVolume;
+	uint8_t* prmryBtnOpacity;
+	uint8_t* leftBtnOpacity;
+	uint8_t* rightBtnOpacity;
 	
 	/*GameImage* imgPlayer;
 	GameImage* imgAnimation;*/
@@ -71,6 +75,9 @@ private:
 	void startGame();
 	void restartFlags();
 	void initIcon();
+	void renderButtonPrmry();
+	void renderButtonLeft();
+	void renderButtonRight();
 	void resetMouseflags();
 	void settings();
 

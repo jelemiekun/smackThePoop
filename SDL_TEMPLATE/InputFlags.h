@@ -20,6 +20,9 @@ struct InputFlags {
 	unsigned int animateSlap : 1;
 	unsigned int animateSlapInProgress : 1;
 	unsigned int animateSlapFinished : 1;
+	unsigned int clickedButtonPrmry : 1;
+	unsigned int clickedButtonLeft : 1;
+	unsigned int clickedButtonRight : 1;
 
 	unsigned int GOBGoutside : 1;
 	unsigned int GOBGinside : 2;

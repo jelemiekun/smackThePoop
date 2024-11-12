@@ -15,7 +15,7 @@ constexpr int FONT_SIZE_TIMER = 28;
 constexpr int FONT_SIZE_GAME = 34;
 constexpr int FONT_SIZE_PLAY_AGAIN = 16;
 
-constexpr auto PRIMARY_BUTTON = SDLK_RETURN;
+constexpr auto PRIMARY_BUTTON = SDLK_l;
 constexpr auto LEFT_BUTTON = SDLK_j;
 constexpr auto RIGHT_BUTTON = SDLK_k;
 
