@@ -943,7 +943,7 @@ void Game::renderButtonPrmry() {
 }
 
 void Game::renderButtonLeft() {
-	if (flags->clickedButtonLeft) {
+	if (flags->clickedButtonLeft && flags->poopInProgress) {
 		int diff = 4;
 		*leftBtnOpacity = (*leftBtnOpacity - diff < 0) ? 0 : *leftBtnOpacity - diff;
 	}
@@ -965,7 +965,7 @@ void Game::renderButtonLeft() {
 }
 
 void Game::renderButtonRight() {
-	if (flags->clickedButtonRight) {
+	if (flags->clickedButtonRight && flags->poopInProgress) {
 		int diff = 4;
 		*rightBtnOpacity = (*rightBtnOpacity - diff < 0) ? 0 : *rightBtnOpacity - diff;
 	}
