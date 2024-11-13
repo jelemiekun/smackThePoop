@@ -4,7 +4,7 @@ Timer::Timer() : startingTime(0), currentTime(0), finish(true), stopped(false) {
 
 Timer::~Timer() {}
 
-void Timer::setStartingTime(Uint32 time) {
+void Timer::setStartingTime(const Uint32 &time) {
 	startingTime = time;
 }
 

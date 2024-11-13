@@ -2,6 +2,18 @@
 #include <iostream>
 #include <string>
 
+constexpr static const char* SCREEN_TITLE = "Smack The Poop";
+constexpr static int SCREEN_X_POS = SDL_WINDOWPOS_CENTERED;
+constexpr static int SCREEN_Y_POS = SDL_WINDOWPOS_CENTERED;
+constexpr static Uint16 SCREEN_WIDTH = 640;
+constexpr static Uint16 SCREEN_HEIGHT = 640;
+constexpr static Uint32 SCREEN_FLAGS = SDL_WINDOW_SHOWN;
+constexpr static bool LIMIT = true;
+
+constexpr auto PRIMARY_BUTTON = SDLK_l;
+constexpr auto LEFT_BUTTON = SDLK_j;
+constexpr auto RIGHT_BUTTON = SDLK_k;
+
 Game::Game() : gWindow(nullptr), running(false), 
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
 				imgHeart3(nullptr), imgStartBG(nullptr), timerRect(nullptr),
@@ -59,19 +71,19 @@ void Game::init() {
 	else
 		std::cout << "SDL_TTF initialized." << '\n';
 
-	gFontTimer = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE_TIMER);
+	gFontTimer = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZES::SIZE_TIMER);
 	if (gFontTimer == nullptr)
 		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
 	else
 		std::cout << "Font yubold loaded." << '\n';
 
-	gFontGame = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE_GAME);
+	gFontGame = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZES::SIZE_GAME);
 	if (gFontGame == nullptr)
 		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
 	else
 		std::cout << "Font yubold loaded." << '\n';
 
-	gFontPlayAgain = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZE_PLAY_AGAIN);
+	gFontPlayAgain = TTF_OpenFont("assets/Yubold.ttf", FONT_SIZES::SIZE_PLAY_AGAIN);
 	if (gFontPlayAgain == nullptr)
 		std::cout << "Failed to load font: " << TTF_GetError() << '\n';
 	else
@@ -131,7 +143,7 @@ void Game::init() {
 
 	character = new Character;
 	character->loadFromFile(gRenderer, "assets/img/player.png");
-	character->init();
+	character->init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	controller1 = new GameController;
 	controller1->init();
@@ -196,7 +208,7 @@ void Game::init() {
 	timerRect->h = 50;
 
 	poopBar = new PoopBar;
-	poopBar->init(gRenderer);
+	poopBar->init(gRenderer, SCREEN_WIDTH);
 	poopBar->setXY(150, 10);
 
 	
@@ -639,7 +651,7 @@ void Game::render() {
 	constexpr int HEART_Y_ALLOWANCE = 15;
 	constexpr int HEART_GAP = 3;
 
-	SDL_Rect heart1 = { 0 + HEART_X_ALLOWANCE, HEART_Y_ALLOWANCE,
+	SDL_Rect heart1 = {0 + HEART_X_ALLOWANCE, HEART_Y_ALLOWANCE,
 		imgHeart1->getSrcRect()->w / 7, imgHeart1->getSrcRect()->h / 7 };
 
 	SDL_Rect heart2 = { (imgHeart2->getSrcRect()->w / 7,
@@ -656,14 +668,14 @@ void Game::render() {
 	imgHeart3->render(gRenderer, &heart3, heartStates.heart3);
 
 	SDL_Color black = { 0, 0, 0, 255 };
-	textTimer->loadFromRenderedText(gRenderer, gameTimer->getTimeInFormat(), black, timerRect );
+	//textTimer->loadFromRenderedText(gRenderer, gameTimer->getTimeInFormat(), black, timerRect );
 
-	character->animate(gRenderer, flags->takeDamage);
+	character->animate(gRenderer, flags->takeDamage, SCREEN_WIDTH);
 	poopBar->render(gRenderer);
 
-	if (*prmryBtnOpacity != 0) renderButtonPrmry();
-	if (*leftBtnOpacity != 0) renderButtonLeft();
-	if (*rightBtnOpacity != 0) renderButtonRight();
+	//if (*prmryBtnOpacity != 0) renderButtonPrmry();
+	//if (*leftBtnOpacity != 0) renderButtonLeft();
+	//if (*rightBtnOpacity != 0) renderButtonRight();
 
 	if (flags->poopInProgress) {
 		poopFart->render(gRenderer);
@@ -736,6 +748,7 @@ void Game::render() {
 	
 	// std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << ", " << flags->inSettings << '\n';
 	// std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
+
 	if (inStartMenu) startMenu();
 	if (playAgain) startGame();
 	if (inGameOver) gameOver();

@@ -23,7 +23,7 @@ void PoopBar::updateEachRectPoop() {
 	}
 }
 
-void PoopBar::init(SDL_Renderer* renderer) {
+void PoopBar::init(SDL_Renderer* renderer, const Uint16& SCREEN_WIDTH) {
 	mTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
 		(SCREEN_WIDTH / 30) * 16, 50);
 

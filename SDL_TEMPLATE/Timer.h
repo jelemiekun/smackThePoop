@@ -17,7 +17,7 @@ public:
 	Timer();
 	~Timer();
 
-	void setStartingTime(Uint32 time);
+	void setStartingTime(const Uint32 &time);
 	void startTimer();
 	Uint32 getRawTime();
 	std::string getTimeInFormat();

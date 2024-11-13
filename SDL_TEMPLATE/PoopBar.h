@@ -4,10 +4,13 @@
 
 class PoopBar {
 private:
+	constexpr static int POOP_COUNT = 15;
+
 	SDL_Texture* mTexture;
 	SDL_Rect* rectBorder;
 	SDL_Rect* rect[POOP_COUNT];
 	uint8_t poopRemaining;
+	
 
 private:
 	void updateEachRectPoop();
@@ -16,7 +19,7 @@ public:
 	PoopBar();
 	~PoopBar();
 
-	void init(SDL_Renderer* renderer);
+	void init(SDL_Renderer* renderer, const Uint16& SCREEN_WIDTH);
 	void setXY(int x, int y);
 	void render(SDL_Renderer* renderer);
 	void poopReleased();

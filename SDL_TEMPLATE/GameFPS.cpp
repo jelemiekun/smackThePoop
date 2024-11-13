@@ -2,6 +2,9 @@
 #include "App_Info.h"
 #include "iostream"
 
+
+constexpr static Uint16 MAX_FPS = 60;
+constexpr static float FRAME_DURATION = 1000.0F / MAX_FPS;
 void GameFPS::initCalculateFPS() {
 	startTime = SDL_GetTicks();
 	frameCount = 0;

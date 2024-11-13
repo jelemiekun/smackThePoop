@@ -7,6 +7,10 @@ struct ToRelease {
 
 class PoopFart : public GameImage {
 private:
+	constexpr static int POOPFART_ANIMATION_PARTS = 6;
+	constexpr static int POOPFART_FRAMES_PER_ANIMATION = 8;
+	constexpr static int POOPFART_EACH_FRAME_DURATION = 6;
+
 	int frameCount;
 	bool finishRendering;
 	int widthEachSprite;

@@ -7,16 +7,15 @@ Character::Character() : frameCount(0), takingDmg(false) {}
 
 Character::~Character() {}
 
-void Character::init() {
+void Character::init(const Uint16 &SCREEN_WIDTH, const Uint16 &SCREEN_HEIGHT) {
 	gSpriteClips[0] = { 0, 0, getSrcRect()->w / 2, getSrcRect()->h };
 	gSpriteClips[1] = { getSrcRect()->w / 2, 0, getSrcRect()->w / 2, getSrcRect()->h };
-	std::cout << getSrcRect()->w / 2 << '\n';
 
 	rectCharacter = { 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT };
 	rectCharacter.x = (SCREEN_WIDTH / 2) - (rectCharacter.w / 2);
 }
 
-void Character::animate(SDL_Renderer* renderer, bool takeDamage) {
+void Character::animate(SDL_Renderer* renderer, bool takeDamage, const Uint16& SCREEN_WIDTH) {
 	SDL_SetTextureColorMod(mTexture, 255, 255, 255);
 	rectCharacter.x = (SCREEN_WIDTH / 2) - (rectCharacter.w / 2);
 	rectCharacter.y = 0;
