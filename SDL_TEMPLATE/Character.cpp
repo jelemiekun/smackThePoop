@@ -15,7 +15,7 @@ void Character::init(const Uint16 &SCREEN_WIDTH, const Uint16 &SCREEN_HEIGHT) {
 	rectCharacter.x = (SCREEN_WIDTH / 2) - (rectCharacter.w / 2);
 }
 
-void Character::animate(SDL_Renderer* renderer, bool takeDamage, const Uint16& SCREEN_WIDTH) {
+void Character::animate(SDL_Renderer*& renderer, bool takeDamage, const Uint16& SCREEN_WIDTH) {
 	SDL_SetTextureColorMod(mTexture, 255, 255, 255);
 	rectCharacter.x = (SCREEN_WIDTH / 2) - (rectCharacter.w / 2);
 	rectCharacter.y = 0;

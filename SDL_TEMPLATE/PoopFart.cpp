@@ -64,20 +64,20 @@ bool PoopFart::isFinishRendering() const {
 	return finishRendering;
 }
 
-void PoopFart::setFinishRendering(bool finish) {
+void PoopFart::setFinishRendering(const bool &finish) {
 	finishRendering = finish;
 }
 
-void PoopFart::setReleaseState(int state) {
+void PoopFart::setReleaseState(const int &state) {
 	toRelease->state = state;
 }
 
-void PoopFart::render(SDL_Renderer* renderer) {
+void PoopFart::render(SDL_Renderer*& renderer) {
 	if (finishRendering) {
 		finishRendering = false;
 	}
 
-	SDL_Rect* currentClip = rectArrays[toRelease->state][frameCount / POOPFART_EACH_FRAME_DURATION];
+	SDL_Rect currentClip = *rectArrays[toRelease->state][frameCount / POOPFART_EACH_FRAME_DURATION];
 
 
 	++frameCount;
@@ -86,7 +86,7 @@ void PoopFart::render(SDL_Renderer* renderer) {
 		finishRendering = true;
 		frameCount = 0;
 	} else {
-		SDL_RenderCopy(renderer, mTexture, currentClip, dstRect);
+		SDL_RenderCopy(renderer, mTexture, &currentClip, dstRect);
 	}
 }
 

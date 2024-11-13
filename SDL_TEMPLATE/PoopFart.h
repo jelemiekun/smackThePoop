@@ -31,9 +31,9 @@ public:
 	unsigned int getToReleaseState();
 	void generateRandomNumber();
 	bool isFinishRendering() const;
-	void setFinishRendering(bool finish);
-	void setReleaseState(int state);
-	void render(SDL_Renderer* renderer);
+	void setFinishRendering(const bool &finish);
+	void setReleaseState(const int &state);
+	void render(SDL_Renderer*& renderer);
 	void close();
 };
 

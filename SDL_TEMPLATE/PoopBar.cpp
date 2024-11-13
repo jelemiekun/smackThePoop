@@ -23,7 +23,7 @@ void PoopBar::updateEachRectPoop() {
 	}
 }
 
-void PoopBar::init(SDL_Renderer* renderer, const Uint16& SCREEN_WIDTH) {
+void PoopBar::init(SDL_Renderer*& renderer, const Uint16& SCREEN_WIDTH) {
 	mTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
 		(SCREEN_WIDTH / 30) * 16, 50);
 
@@ -39,13 +39,13 @@ void PoopBar::init(SDL_Renderer* renderer, const Uint16& SCREEN_WIDTH) {
 	SDL_QueryTexture(mTexture, NULL, NULL, &rectBorder->w, &rectBorder->h);
 }
 
-void PoopBar::setXY(int x, int y) {
+void PoopBar::setXY(const int &x, const int &y) {
 	rectBorder->x = x;
 	rectBorder->y = y;
 	updateEachRectPoop();
 }
 
-void PoopBar::render(SDL_Renderer* renderer) {
+void PoopBar::render(SDL_Renderer*& renderer) {
 	SDL_SetRenderTarget(renderer, mTexture);
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

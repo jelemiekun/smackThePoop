@@ -15,6 +15,6 @@ public:
 	~Character();
 	
 	void init(const Uint16& SCREEN_WIDTH, const Uint16& SCREEN_HEIGHT);
-	void animate(SDL_Renderer* renderer, bool takeDamage, const Uint16& SCREEN_WIDTH);
+	void animate(SDL_Renderer*& renderer, bool takeDamage, const Uint16& SCREEN_WIDTH);
 };
 

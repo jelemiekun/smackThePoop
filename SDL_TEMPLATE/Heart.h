@@ -5,6 +5,6 @@ public:
 	Heart();
 	~Heart();
 
-	void render(SDL_Renderer* renderer, SDL_Rect* dstRect, bool isRed);
+	void render(SDL_Renderer*& renderer, const SDL_Rect* dstRect, const bool &isRed);
 };
 

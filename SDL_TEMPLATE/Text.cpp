@@ -6,11 +6,14 @@ Text::~Text() {
 	close();
 }
 
-void Text::setGFont(TTF_Font* font) {
+void Text::setGFont(TTF_Font*& font) {
 	gFont = font;
 }
 
-void Text::loadFromRenderedText(SDL_Renderer* renderer, std::string text, SDL_Color color, SDL_Rect* dstRect) {
+void Text::loadFromRenderedText(SDL_Renderer*& renderer, const std::string &text, const SDL_Color &color, const SDL_Rect* dstRect) {
+	SDL_DestroyTexture(mTexture);
+	mTexture = nullptr;
+
 	SDL_Surface* newSurface = TTF_RenderText_Solid(gFont, text.c_str(), color);
 
 	if (newSurface == nullptr) {

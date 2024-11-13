@@ -4,7 +4,7 @@ GameImage::GameImage() : mTexture(nullptr), srcRect(new SDL_Rect) {}
 
 GameImage::~GameImage() {}
 
-void GameImage::loadFromFile(SDL_Renderer* renderer, const char* path) {
+void GameImage::loadFromFile(SDL_Renderer*& renderer, const char* path) {
 	SDL_Surface* newSurface = IMG_Load(path);
 
 	if (newSurface == nullptr) {
@@ -28,7 +28,7 @@ void GameImage::loadFromFile(SDL_Renderer* renderer, const char* path) {
 	SDL_FreeSurface(newSurface);
 }
 
-void GameImage::render(SDL_Renderer* renderer, SDL_Rect* dstRect) const {
+void GameImage::render(SDL_Renderer*& renderer, const SDL_Rect* dstRect) const {
 	SDL_RenderCopy(renderer, mTexture, srcRect, dstRect);
 }
 

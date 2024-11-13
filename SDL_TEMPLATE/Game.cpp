@@ -668,14 +668,16 @@ void Game::render() {
 	imgHeart3->render(gRenderer, &heart3, heartStates.heart3);
 
 	SDL_Color black = { 0, 0, 0, 255 };
-	//textTimer->loadFromRenderedText(gRenderer, gameTimer->getTimeInFormat(), black, timerRect );
+	textTimer->loadFromRenderedText(gRenderer, gameTimer->getTimeInFormat(), black, timerRect );
 
 	character->animate(gRenderer, flags->takeDamage, SCREEN_WIDTH);
 	poopBar->render(gRenderer);
 
-	//if (*prmryBtnOpacity != 0) renderButtonPrmry();
-	//if (*leftBtnOpacity != 0) renderButtonLeft();
-	//if (*rightBtnOpacity != 0) renderButtonRight();
+	// Memory Leak Here
+
+	if (*prmryBtnOpacity != 0) renderButtonPrmry();
+	if (*leftBtnOpacity != 0) renderButtonLeft();
+	if (*rightBtnOpacity != 0) renderButtonRight();
 
 	if (flags->poopInProgress) {
 		poopFart->render(gRenderer);
@@ -836,7 +838,8 @@ void Game::startMenu() {
 		}
 	}
 
-	SDL_Rect SMDstRect = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 60, (SCREEN_HEIGHT / 2) - ((srcRect.h) / 3) - 40,
+	
+	SDL_Rect SMDstRect = {(SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 60, (SCREEN_HEIGHT / 2) - ((srcRect.h) / 3) - 40,
 	400, 500 };
 
 	imgStartBG->srcRect = &srcRect;

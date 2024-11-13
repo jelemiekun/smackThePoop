@@ -100,7 +100,7 @@ void GameSound::loadSoundFX() {
 		std::cout << "FX countDownBeep loaded." << '\n';
 }
 
-void GameSound::setMusic(ClassMusic music) {
+void GameSound::setMusic(const ClassMusic &music) {
 	switch (music) {
 	case ClassMusic::startMenu:	gMusicCurrent = gMusicStartMenu; break;
 	case ClassMusic::playing: gMusicCurrent = gMusicPlaying; break;
@@ -118,7 +118,7 @@ void GameSound::stopMusic() {
 	Mix_FadeOutMusic(1000);
 }
 
-void GameSound::setSoundFX(ClassSoundFXState state) {
+void GameSound::setSoundFX(const ClassSoundFXState &state) {
 	FXState = state;
 }
 

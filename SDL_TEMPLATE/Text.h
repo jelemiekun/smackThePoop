@@ -17,9 +17,9 @@ public:
 	Text();
 	~Text();
 
-	void setGFont(TTF_Font* font);
+	void setGFont(TTF_Font*& font);
 
-	void loadFromRenderedText(SDL_Renderer* renderer, std::string text, SDL_Color color, SDL_Rect* dstRect);
+	void loadFromRenderedText(SDL_Renderer*& renderer, const std::string &text, const SDL_Color &color, const SDL_Rect* dstRect);
 
 	void close();
 };

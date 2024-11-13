@@ -13,9 +13,9 @@ public:
 	GameImage();
 	~GameImage();
 
-	void loadFromFile(SDL_Renderer* renderer, const char* path);
+	void loadFromFile(SDL_Renderer*& renderer, const char* path);
 
-	void render(SDL_Renderer* renderer, SDL_Rect* dstRect) const;
+	void render(SDL_Renderer*& renderer, const SDL_Rect* dstRect) const;
 
 	SDL_Rect* getSrcRect() const;
 

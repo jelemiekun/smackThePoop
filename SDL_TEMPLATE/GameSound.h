@@ -46,10 +46,10 @@ public:
 	void initMixer();
 	void loadSoundFX();
 	void loadMusics();
-	void setMusic(ClassMusic music);
+	void setMusic(const ClassMusic &music);
 	void playMusic();
 	void stopMusic();
-	void setSoundFX(ClassSoundFXState state);
+	void setSoundFX(const ClassSoundFXState &state);
 	void setFXsVolume(const uint16_t &volume);
 	void playSoundFX();
 	void close();

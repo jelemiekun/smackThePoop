@@ -19,9 +19,9 @@ public:
 	PoopBar();
 	~PoopBar();
 
-	void init(SDL_Renderer* renderer, const Uint16& SCREEN_WIDTH);
-	void setXY(int x, int y);
-	void render(SDL_Renderer* renderer);
+	void init(SDL_Renderer*& renderer, const Uint16& SCREEN_WIDTH);
+	void setXY(const int& x, const int& y);
+	void render(SDL_Renderer*& renderer);
 	void poopReleased();
 	void resetPoopBar();
 	uint8_t getPoopRemaining() const;
