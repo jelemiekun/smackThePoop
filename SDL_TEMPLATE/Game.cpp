@@ -673,8 +673,6 @@ void Game::render() {
 	character->animate(gRenderer, flags->takeDamage, SCREEN_WIDTH);
 	poopBar->render(gRenderer);
 
-	// Memory Leak Here
-
 	if (*prmryBtnOpacity != 0) renderButtonPrmry();
 	if (*leftBtnOpacity != 0) renderButtonLeft();
 	if (*rightBtnOpacity != 0) renderButtonRight();

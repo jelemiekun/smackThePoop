@@ -86,7 +86,8 @@ void PoopFart::render(SDL_Renderer*& renderer) {
 		finishRendering = true;
 		frameCount = 0;
 	} else {
-		SDL_RenderCopy(renderer, mTexture, &currentClip, dstRect);
+		// Memory Leak Here
+		 SDL_RenderCopy(renderer, *&mTexture, &currentClip, dstRect);
 	}
 }
 
