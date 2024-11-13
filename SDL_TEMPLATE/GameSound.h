@@ -8,7 +8,8 @@ enum class ClassSoundFXState {
 	hitPoop,
 	poopStart,
 	poopEnd,
-	fart
+	fart,
+	countDownBeep
 };
 
 enum class ClassMusic {
@@ -34,6 +35,7 @@ private:
 	Mix_Chunk* gFXPoopStart;
 	Mix_Chunk* gFXPoopEnd;
 	Mix_Chunk* gFXFart;
+	Mix_Chunk* gFXBeep;
 
 	ClassSoundFXState FXState;
 

@@ -6,7 +6,7 @@ GameSound::GameSound() : gMusicCurrent(nullptr), gMusicStartMenu(nullptr),
 					gFXRelief(nullptr), 	gFXGrunt(nullptr),
 					gFXHitPlayer(nullptr),	gFXHitPoop(nullptr), 
 					gFXPoopStart(nullptr),	gFXPoopEnd(nullptr),  
-					gFXFart(nullptr), gMusicWin(nullptr) {};
+					gFXFart(nullptr), gMusicWin(nullptr), gFXBeep(nullptr) {};
 
 GameSound::~GameSound() {}
 
@@ -92,13 +92,12 @@ void GameSound::loadSoundFX() {
 	else
 		std::cout << "FX fart loaded." << '\n';
 
-	Mix_VolumeChunk(gFXRelief, 100);
-	Mix_VolumeChunk(gFXGrunt, 100);
-	Mix_VolumeChunk(gFXHitPlayer, 124);
-	Mix_VolumeChunk(gFXHitPoop, 100);
-	Mix_VolumeChunk(gFXPoopStart, 100);
-	Mix_VolumeChunk(gFXPoopEnd, 70);
-	Mix_VolumeChunk(gFXFart, 70);
+	gFXBeep = Mix_LoadWAV("assets/fx/countDownBeep.wav");
+
+	if (gFXBeep == nullptr)
+		std::cout << "Failed to load fx count down beep: " << Mix_GetError() << '\n';
+	else
+		std::cout << "FX countDownBeep loaded." << '\n';
 }
 
 void GameSound::setMusic(ClassMusic music) {
@@ -145,6 +144,9 @@ void GameSound::playSoundFX() {
 		break;
 	case ClassSoundFXState::fart:
 		Mix_PlayChannel(-1, gFXFart, 0);
+		break;
+	case ClassSoundFXState::countDownBeep:
+		Mix_PlayChannel(-1, gFXBeep, 0);
 		break;
 	default:
 		break;

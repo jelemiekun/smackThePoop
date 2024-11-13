@@ -688,6 +688,16 @@ void Game::render() {
 
 	// If LIMIT is on while playing
 	if (LIMIT && flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings) {
+		// Play beep sound if 3 or 2 or 1 seconds left
+		Uint32 timeLeft = gameTimer->getRawTime();
+		if ((timeLeft >= 990 && timeLeft <= 1010) ||
+			(timeLeft >= 1990 && timeLeft <= 2010) ||
+			(timeLeft >= 2990 && timeLeft <= 3010) ||
+			(timeLeft >= 3990 && timeLeft <= 4010)) {
+			gameSounds->setSoundFX(ClassSoundFXState::countDownBeep);
+			gameSounds->playSoundFX();
+		}
+
 		flags->win = poopBar->getPoopRemaining() == 0;
 
 		// If player win
