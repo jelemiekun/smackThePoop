@@ -29,6 +29,7 @@ private:
 	GameImage* imgSettingsBG;
 	GameImage* imgButtons;
 	GameImage* imgPauseBG;
+	GameImage* imgNoteBG;
 	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;
@@ -75,6 +76,7 @@ private:
 	void gameOver();
 	bool isGameOver() const;
 	void startGame();
+	void note();
 	void restartFlags();
 	void initIcon();
 	void renderButtonPrmry();

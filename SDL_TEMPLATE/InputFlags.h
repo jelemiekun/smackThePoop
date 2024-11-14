@@ -49,4 +49,8 @@ struct InputFlags {
 	unsigned int SETinBack : 1;
 
 	unsigned int readyToChangeMusic : 1;
+
+	unsigned int NOTEoutside : 1;
+	unsigned int NOTEokayClick : 1;
+	unsigned int doneReadingNotes : 1;
 };

@@ -27,7 +27,7 @@ Game::Game() : gWindow(nullptr), running(false),
 				sliderHandleMusicVol(nullptr), sliderHandleSFXVol(nullptr), 
 				sliderMusicVol(nullptr), sliderSFXVol(nullptr), sliderMusicDragging(nullptr),
 				musicVolume(nullptr), imgButtons(nullptr), prmryBtnOpacity(nullptr),
-				imgPauseBG(nullptr), textPause(nullptr) {}
+				imgPauseBG(nullptr), textPause(nullptr), imgNoteBG(nullptr) {}
 
 Game::~Game() {}
 
@@ -132,6 +132,9 @@ void Game::init() {
 
 	imgPauseBG = new GameImage;
 	imgPauseBG->loadFromFile(gRenderer, "assets/img/pauseBG.png");
+
+	imgNoteBG = new GameImage;
+	imgNoteBG->loadFromFile(gRenderer, "assets/img/noteBG.png");
 
 	prmryBtnOpacity = new uint8_t;
 	leftBtnOpacity = new uint8_t;
@@ -241,6 +244,10 @@ void Game::init() {
 	flags->SMinSettClick = 0;
 	flags->SMinQuitClick = 0;
 
+	flags->NOTEoutside = 1;
+	flags->NOTEokayClick = 0;
+	flags->doneReadingNotes = 0;
+
 	resetMouseflags();
 
 	gameTimer->resetTimer();
@@ -291,6 +298,9 @@ void Game::input() {
 	bool PauseOutsideStart = true;
 	bool PauseOutsideQuit = true;
 
+	constexpr static SDL_Rect NOTE1 = { 149 + 48, 426, 254, 86 };
+	constexpr static SDL_Rect NOTE2 = { 134 + 48, 442, 284, 55 };
+
 	int x = 0;
 	int y = 0;
 
@@ -304,6 +314,38 @@ void Game::input() {
 		if (event.type == SDL_QUIT) {
 			running = false;
 		} else {
+			
+			// If reading notes
+			if (!flags->doneReadingNotes) {
+				if (event.type == SDL_MOUSEMOTION) {
+					x = event.motion.x;
+					y = event.motion.y;
+
+					flags->NOTEoutside = (x < NOTE1.x || x > NOTE1.x + NOTE1.w || y < NOTE1.y || y > NOTE1.y + NOTE1.h) ||
+						(x < NOTE2.x || x > NOTE2.x + NOTE2.w || y < NOTE2.y || y > NOTE2.y + NOTE2.h);
+
+
+				} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+					if (!flags->NOTEoutside) flags->NOTEokayClick = 1;
+				} else if (event.type == SDL_MOUSEBUTTONUP) {
+					if (flags->NOTEokayClick && !flags->NOTEoutside) {
+						flags->NOTEoutside = 1;
+						flags->NOTEokayClick = 0;
+						flags->doneReadingNotes = 1;
+
+						flags->SMoutside = 1;
+						flags->SMinPlay = 0;
+						flags->SMinSett = 0;
+						flags->SMinQuit = 0;
+						flags->SMinPlayClick = 0;
+						flags->SMinSettClick = 0;
+						flags->SMinQuitClick = 0;
+					} else {
+						flags->NOTEokayClick = 0;
+					}
+				}
+				return;
+			}
 
 			// If in settings
 			if (!flags->inGameOver && !flags->playing && !flags->inStart && flags->inSettings && !flags->inPause) {
@@ -994,6 +1036,57 @@ void Game::startMenu() {
 	SDL_Color brownSM = { 99, 51, 0, 255 };
 	SDL_Rect dstRectSM3 = { 180, 155 , 290, 60 };
 	textSM1->loadFromRenderedText(gRenderer, "P O O P", brownSM, &dstRectSM3);
+
+	if (!flags->doneReadingNotes) note();
+}
+
+void Game::note() {
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 150);
+	SDL_Rect blackTransparent = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	SDL_RenderFillRect(gRenderer, &blackTransparent);
+
+	int wSM = 0;
+	int hSM = 0;
+
+	SDL_QueryTexture(imgNoteBG->mTexture, NULL, NULL, &wSM, &hSM);
+
+	SDL_Rect srcRect = { (wSM / 3) * 0, 0, wSM / 3, hSM };
+
+	if (!flags->NOTEoutside) {
+		if (flags->NOTEokayClick) srcRect.x = (wSM / 3) * 2;
+		else srcRect.x = (wSM / 3) * 1;
+	}
+
+
+	SDL_Rect SMDstRect = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 60, (SCREEN_HEIGHT / 2) - ((srcRect.h) / 3) - 40,
+	400, 500 };
+
+	imgNoteBG->srcRect = &srcRect;
+	imgNoteBG->render(gRenderer, &SMDstRect);
+
+	SDL_Color blackSM = { 0, 0, 0, 255 };
+	SDL_Rect dstRectSM1 = { 148, 90 , 340, 90 };
+	textSM1->loadFromRenderedText(gRenderer, "H o w  to  p l a y", blackSM, &dstRectSM1);
+
+	dstRectSM1 = { 150, 190 , 320, 30 };
+	textSM1->loadFromRenderedText(gRenderer, "-Smack green/red poop", blackSM, &dstRectSM1);
+
+	dstRectSM1 = { 150, 210 , 320, 30 };
+	textSM1->loadFromRenderedText(gRenderer, " before shooting in the bowl.", blackSM, &dstRectSM1);
+
+	dstRectSM1 = { 150, 250 , 320, 30 };
+	textSM1->loadFromRenderedText(gRenderer, "-Press L to p o o p.", blackSM, &dstRectSM1);
+
+	dstRectSM1 = { 150, 290 , 320, 30 };
+	textSM1->loadFromRenderedText(gRenderer, "-Press J to smack green poop.", blackSM, &dstRectSM1);
+
+	dstRectSM1 = { 150, 330 , 320, 30 };
+	textSM1->loadFromRenderedText(gRenderer, "-Press K to smack red poop.", blackSM, &dstRectSM1);
+
+	dstRectSM1 = { 150, 370 , 320, 30 };
+	textSM1->loadFromRenderedText(gRenderer, "-Avoid smacking brown poop or farts.", blackSM, &dstRectSM1);
 }
 
 void Game::gameOver() {
