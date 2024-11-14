@@ -5,6 +5,7 @@ struct InputFlags {
 	unsigned int inStart : 1;
 	unsigned int inGameOver : 1;
 	unsigned int inSettings : 1;
+	unsigned int inPause : 1;
 
 	unsigned int win : 1;
 
@@ -23,6 +24,8 @@ struct InputFlags {
 	unsigned int clickedButtonPrmry : 1;
 	unsigned int clickedButtonLeft : 1;
 	unsigned int clickedButtonRight : 1;
+	unsigned int pauseButtonClickFinished : 1;
+	unsigned int pauseButtonClickInProgress : 1;
 
 	unsigned int GOBGoutside : 1;
 	unsigned int GOBGinside : 2;
@@ -34,6 +37,14 @@ struct InputFlags {
 	unsigned int SMinPlayClick : 1;
 	unsigned int SMinSettClick : 1;
 	unsigned int SMinQuitClick : 1;
+	
+	unsigned int PSOutside : 1;
+	unsigned int PSResumeInside : 1;
+	unsigned int PSRestartInside : 1;
+	unsigned int PSRQuitInside : 1;
+	unsigned int PSInResumeClick : 1;
+	unsigned int PSInRestartClick : 1;
+	unsigned int PSInQuitClick : 1;
 
 	unsigned int SETinBack : 1;
 

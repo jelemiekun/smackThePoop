@@ -10,8 +10,10 @@ private:
 	Uint32 startingTime;
 	Uint32 currentTime;
 	Uint32 remainingTime;
+	Uint32 pausedTime;
 	bool finish;
 	bool stopped;
+	bool paused;
 
 public:
 	Timer();
@@ -23,6 +25,8 @@ public:
 	std::string getTimeInFormat();
 	bool isFinish() const;
 	void stopTimer();
+	void pauseTimer();
+	void unpauseTimer();
 	void resetTimer();
 };
 

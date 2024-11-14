@@ -28,6 +28,7 @@ private:
 	GameImage* imgStartBG;
 	GameImage* imgSettingsBG;
 	GameImage* imgButtons;
+	GameImage* imgPauseBG;
 	InputFlags* flags;
 	Heart* imgHeart1;
 	Heart* imgHeart2;
@@ -46,6 +47,7 @@ private:
 	Text* textSM1;
 	Text* textSM2;
 	Text* textSM3;
+	Text* textPause;
 	SDL_Rect* timerRect;
 	PoopBar* poopBar;
 	PoopFart* poopFart;
@@ -80,6 +82,7 @@ private:
 	void renderButtonRight();
 	void resetMouseflags();
 	void settings();
+	void pause();
 
 public:
 	Game();

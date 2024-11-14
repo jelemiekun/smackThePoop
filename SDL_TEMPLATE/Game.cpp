@@ -10,9 +10,10 @@ constexpr static Uint16 SCREEN_HEIGHT = 640;
 constexpr static Uint32 SCREEN_FLAGS = SDL_WINDOW_SHOWN;
 constexpr static bool LIMIT = true;
 
-constexpr auto PRIMARY_BUTTON = SDLK_l;
-constexpr auto LEFT_BUTTON = SDLK_j;
-constexpr auto RIGHT_BUTTON = SDLK_k;
+constexpr static auto PRIMARY_BUTTON = SDLK_l;
+constexpr static auto LEFT_BUTTON = SDLK_j;
+constexpr static auto RIGHT_BUTTON = SDLK_k;
+constexpr static auto PAUSE_BUTTON = SDLK_ESCAPE;
 
 Game::Game() : gWindow(nullptr), running(false), 
 				imgBackground(nullptr), imgHeart1(nullptr), imgHeart2(nullptr),
@@ -25,7 +26,8 @@ Game::Game() : gWindow(nullptr), running(false),
 				textPlayAgain(nullptr), textSM1(nullptr), textSM2(nullptr), textSM3(nullptr),
 				sliderHandleMusicVol(nullptr), sliderHandleSFXVol(nullptr), 
 				sliderMusicVol(nullptr), sliderSFXVol(nullptr), sliderMusicDragging(nullptr),
-				musicVolume(nullptr), imgButtons(nullptr), prmryBtnOpacity(nullptr) {}
+				musicVolume(nullptr), imgButtons(nullptr), prmryBtnOpacity(nullptr),
+				imgPauseBG(nullptr), textPause(nullptr) {}
 
 Game::~Game() {}
 
@@ -109,6 +111,9 @@ void Game::init() {
 	textSM3 = new Text;
 	textSM3->setGFont(gFontPlayAgain);
 
+	textPause = new Text;
+	textPause->setGFont(gFontPlayAgain);
+
 	imgBackground = new GameImage;
 	imgBackground->loadFromFile(gRenderer, "assets/img/background.png");
 
@@ -124,6 +129,9 @@ void Game::init() {
 
 	imgButtons = new GameImage;
 	imgButtons->loadFromFile(gRenderer, "assets/img/buttons.png");
+
+	imgPauseBG = new GameImage;
+	imgPauseBG->loadFromFile(gRenderer, "assets/img/pauseBG.png");
 
 	prmryBtnOpacity = new uint8_t;
 	leftBtnOpacity = new uint8_t;
@@ -223,6 +231,7 @@ void Game::init() {
 	flags->inGameOver = 0;
 	flags->inStart = 1;
 	flags->inSettings = 0;
+	flags->inPause = 0;
 
 	flags->win = 0;
 
@@ -272,6 +281,16 @@ void Game::input() {
 	bool GOBGoutsideYes = true;
 	bool GOBGoutsideNo = true;
 
+	constexpr static SDL_Rect PRESUME1 = { 149 + 48, 223, 254, 86 };
+	constexpr static SDL_Rect PRESUME2 = { 134 + 48, 239, 284, 55 };
+	constexpr static SDL_Rect PRESTART1 = { 149 + 48, 380 - 55, 254, 86 };
+	constexpr static SDL_Rect PRESTART2 = { 134 + 48, 398 - 58, 284, 56 };
+	constexpr static SDL_Rect PQUIT1 = { 149 + 48, 426, 254, 86 };
+	constexpr static SDL_Rect PQUIT2 = { 134 + 48, 442, 284, 55 };
+	bool PauseOutsideResume = true;
+	bool PauseOutsideStart = true;
+	bool PauseOutsideQuit = true;
+
 	int x = 0;
 	int y = 0;
 
@@ -287,7 +306,7 @@ void Game::input() {
 		} else {
 
 			// If in settings
-			if (!flags->inGameOver && !flags->playing && !flags->inStart && flags->inSettings) {
+			if (!flags->inGameOver && !flags->playing && !flags->inStart && flags->inSettings && !flags->inPause) {
 				if (event.type == SDL_MOUSEMOTION) {
 					x = event.motion.x;
 					y = event.motion.y;
@@ -342,7 +361,6 @@ void Game::input() {
 					}
 				} else if (event.type == SDL_MOUSEBUTTONUP) {
 					if (flags->SETinBack) {
-						std::cout << "meow" << '\n';
 						flags->inGameOver = 0;
 						flags->inStart = 1;
 						flags->playing = 0;
@@ -360,7 +378,7 @@ void Game::input() {
 			}
 
 			// if in game over menu
-			if (LIMIT && flags->inGameOver && !flags->playing && !flags->inStart && !flags->inSettings) {
+			if (LIMIT && flags->inGameOver && !flags->playing && !flags->inStart && !flags->inSettings && !flags->inPause) {
 				switch (event.type) {
 				case SDL_MOUSEMOTION:
 					x = event.motion.x;
@@ -413,7 +431,7 @@ void Game::input() {
 			}
 
 			// if in start menu
-			if (LIMIT && !flags->inGameOver && !flags->playing && flags->inStart && !flags->inSettings) {
+			if (LIMIT && !flags->inGameOver && !flags->playing && flags->inStart && !flags->inSettings && !flags->inPause) {
 				switch (event.type) {
 				case SDL_MOUSEMOTION:
 					x = event.motion.x;
@@ -473,8 +491,8 @@ void Game::input() {
 				}
 			}
 
-			// if playing
-			if (LIMIT && flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings) {
+			// if playing and not paused
+			if (LIMIT && flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings && !flags->inPause) {
 				switch (event.type) {
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym) {
@@ -543,6 +561,15 @@ void Game::input() {
 							}
 						}
 						break;
+					case PAUSE_BUTTON:
+						if (flags->pauseButtonClickFinished) {
+							flags->inPause = 1;
+							flags->pauseButtonClickFinished = 0;
+							flags->pauseButtonClickInProgress = 1;
+
+							gameTimer->pauseTimer();
+						}
+						break;
 					default:
 						break;
 					}
@@ -555,6 +582,10 @@ void Game::input() {
 						break;
 					case RIGHT_BUTTON:
 						break;
+					case PAUSE_BUTTON:
+						flags->pauseButtonClickFinished = 1;
+						flags->pauseButtonClickInProgress = 0;
+						break;
 					default:
 						break;
 					}
@@ -563,13 +594,114 @@ void Game::input() {
 					break;
 				}
 			}
+
+			// IF playing and paused
+			if (LIMIT && flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings && flags->inPause) {
+				switch (event.type) {
+				case SDL_MOUSEMOTION:
+					x = event.motion.x;
+					y = event.motion.y;
+
+					PauseOutsideResume = x < PRESUME1.x || x > PRESUME1.x + PRESUME1.w || y < PRESUME1.y || y > PRESUME1.y + PRESUME1.h ||
+						x < PRESUME2.x || x > PRESUME2.x + PRESUME2.w || y < PRESUME2.y || y > PRESUME2.y + PRESUME2.h;
+					PauseOutsideStart = x < PRESTART1.x || x > PRESTART1.x + PRESTART1.w || y < PRESTART1.y || y > PRESTART1.y + PRESTART1.h ||
+						x < PRESTART2.x || x > PRESTART2.x + PRESTART2.w || y < PRESTART2.y || y > PRESTART2.y + PRESTART2.h;
+					PauseOutsideQuit = x < PQUIT1.x || x > PQUIT1.x + PQUIT1.w || y < PQUIT1.y || y > PQUIT1.y + PQUIT1.h ||
+						x < PQUIT2.x || x > PQUIT2.x + PQUIT2.w || y < PQUIT2.y || y > PQUIT2.y + PQUIT2.h;
+
+					if (PauseOutsideResume && PauseOutsideStart && PauseOutsideQuit) {
+						flags->PSOutside = 1;
+					} else {
+						flags->PSOutside = 0;
+
+						if (!PauseOutsideResume) { flags->PSResumeInside = 1; flags->PSRestartInside = 0; flags->PSRQuitInside = 0; }
+						if (!PauseOutsideStart) { flags->PSResumeInside = 0; flags->PSRestartInside = 1; flags->PSRQuitInside = 0; }
+						if (!PauseOutsideQuit) { flags->PSResumeInside = 0; flags->PSRestartInside = 0; flags->PSRQuitInside = 1; }
+					}
+					break;
+				case SDL_MOUSEBUTTONDOWN: {
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						if (flags->PSResumeInside) flags->PSInResumeClick = 1; // If play is beging clicked
+						if (flags->PSRestartInside) flags->PSInRestartClick = 1; // If settings is beging clicked
+						if (flags->PSRQuitInside) flags->PSInQuitClick = 1; // If quit is beging clicked
+					}
+				}
+				break;
+				case SDL_MOUSEBUTTONUP:
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						if (flags->PSResumeInside) { // Resume
+							flags->inPause = 0;
+							gameTimer->unpauseTimer();
+						}
+						if (flags->PSRestartInside) {
+							// From pause, play again
+							flags->playing = 0;
+							flags->inStart = 0;
+							flags->inGameOver = 0;
+							flags->inSettings = 0;
+							flags->inPause = 0;
+							startGame();
+						}
+							// From pause, go to main menu
+						// !flags->playing&& flags->inStart && !flags->inGameOver && !flags->inSettings && !flags->inPause;
+						if (flags->PSRQuitInside) { 
+							restartFlags();
+							flags->inPause = 0;
+							flags->playing = 0;
+							flags->inStart = 1;
+							flags->inGameOver = 0;
+							flags->inSettings = 0;
+							flags->readyToChangeMusic = 1;
+						}
+					}
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym) {
+					case PAUSE_BUTTON:
+						if (flags->pauseButtonClickFinished) {
+							flags->inPause = 0;
+							flags->pauseButtonClickFinished = 0;
+							flags->pauseButtonClickInProgress = 1;
+
+							if (flags->inPause) gameTimer->pauseTimer();
+							else gameTimer->unpauseTimer();
+						}
+						break;
+					default:
+						break;
+					}
+					break;
+				case SDL_KEYUP:
+					switch (event.key.keysym.sym) {
+					case PAUSE_BUTTON:
+						flags->pauseButtonClickFinished = 1;
+						flags->pauseButtonClickInProgress = 0;
+						break;
+					default:
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+
+				// If unpaused, reset flags
+				if (!flags->inPause) {
+					flags->PSOutside = 1;
+					flags->PSResumeInside = 0;
+					flags->PSRestartInside = 0;
+					flags->PSRQuitInside = 0;
+					flags->PSInResumeClick = 0;
+					flags->PSInRestartClick = 0;
+					flags->PSInQuitClick = 0;
+				}
+			}
 		}
 	}
 }
 
 void Game::update() {
 	// Handle inputs if currently playing
-	if (flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings) {
+	if (flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings && !flags->inPause) {
 		if (flags->FXInProgress && flags->poopInProgress) {
 			poopFart->generateRandomNumber();
 			int state = poopFart->getToReleaseState();
@@ -673,9 +805,12 @@ void Game::render() {
 	character->animate(gRenderer, flags->takeDamage, SCREEN_WIDTH);
 	poopBar->render(gRenderer);
 
-	if (*prmryBtnOpacity != 0) renderButtonPrmry();
-	if (*leftBtnOpacity != 0) renderButtonLeft();
-	if (*rightBtnOpacity != 0) renderButtonRight();
+	// If currently playing
+	if (flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings) {
+		if (*prmryBtnOpacity != 0) renderButtonPrmry();
+		if (*leftBtnOpacity != 0) renderButtonLeft();
+		if (*rightBtnOpacity != 0) renderButtonRight();
+	}
 
 	if (flags->poopInProgress) {
 		poopFart->render(gRenderer);
@@ -699,7 +834,7 @@ void Game::render() {
 	}
 
 	// If LIMIT is on while playing
-	if (LIMIT && flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings) {
+	if (LIMIT && flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings && !flags->inPause) {
 		// Play beep sound if 3 or 2 or 1 seconds left
 		Uint32 timeLeft = gameTimer->getRawTime();
 		if ((timeLeft >= 990 && timeLeft <= 1010) ||
@@ -719,12 +854,13 @@ void Game::render() {
 			flags->inStart = 0;
 			flags->inGameOver = 1;
 			flags->inSettings = 0;
+			flags->inPause = 0;
 			flags->readyToChangeMusic = 1;
 		}
 	}
 
 	// If LIMIT is toggled and not currently playing
-	if (LIMIT && !(!flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings)) {
+	if (LIMIT && !(!flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings && !flags->inPause)) {
 		//  If currently playing, check if game is finished 
 		if (flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings) {
 			flags->playing = !gameTimer->isFinish(); // Toggle off if timer runs out
@@ -739,12 +875,16 @@ void Game::render() {
 				flags->readyToChangeMusic = 1; // Change music
 			}
 		}
+	} else if (!flags->playing && !flags->inGameOver && !flags->inStart && !flags->inSettings && flags->inPause) {
+		std::cout << "Pausing the game" << '\n';
+		// pause the game;
 	}
 
-	bool inGameOver = LIMIT && !flags->playing && !flags->inStart && flags->inGameOver && !flags->inSettings;
-	bool inStartMenu = !flags->playing && flags->inStart && !flags->inGameOver && !flags->inSettings;
-	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings;
-	bool inSettings = !flags->playing && !flags->inStart && !flags->inGameOver && flags->inSettings;
+	bool inGameOver = LIMIT && !flags->playing && !flags->inStart && flags->inGameOver && !flags->inSettings && !flags->inPause;
+	bool inStartMenu = !flags->playing && flags->inStart && !flags->inGameOver && !flags->inSettings && !flags->inPause;
+	bool playAgain = !flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings && !flags->inPause;
+	bool inSettings = !flags->playing && !flags->inStart && !flags->inGameOver && flags->inSettings && !flags->inPause;
+	bool inPause = flags->playing && !flags->inStart && !flags->inGameOver && !flags->inSettings && flags->inPause;
 	
 	// std::cout << flags->playing << ", " << flags->inStart << ", " << flags->inGameOver << ", " << flags->inSettings << '\n';
 	// std::cout << inGameOver << ", " << inStartMenu << ", " << playAgain << '\n';
@@ -753,6 +893,7 @@ void Game::render() {
 	if (playAgain) startGame();
 	if (inGameOver) gameOver();
 	if (inSettings) settings();
+	if (inPause) pause();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -942,7 +1083,51 @@ void Game::settings() {
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 	SDL_RenderFillRect(gRenderer, sliderHandleMusicVol);
 	SDL_RenderFillRect(gRenderer, sliderHandleSFXVol);
+}
 
+void Game::pause() {
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
+	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 150);
+	SDL_Rect whiteTransparent = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	SDL_RenderFillRect(gRenderer, &whiteTransparent);
+
+	int wSM = 0;
+	int hSM = 0;
+
+	SDL_QueryTexture(imgPauseBG->mTexture, NULL, NULL, &wSM, &hSM);
+
+	SDL_Rect srcRect = { (wSM / 7) * 0, 0, wSM / 7, hSM };
+
+	if (!flags->PSOutside) {
+		if (flags->PSResumeInside) {
+			if (flags->PSInResumeClick) srcRect.x = (wSM / 7) * 2;
+			else srcRect.x = (wSM / 7) * 1;
+		}
+
+		if (flags->PSRestartInside) {
+			if (flags->PSInRestartClick) srcRect.x = (wSM / 7) * 4;
+			else srcRect.x = (wSM / 7) * 3;
+		}
+
+		if (flags->PSRQuitInside) {
+			if (flags->PSInQuitClick) srcRect.x = (wSM / 7) * 6;
+			else srcRect.x = (wSM / 7) * 5;
+		}
+	}
+
+
+	SDL_Rect SMDstRect = { (SCREEN_WIDTH / 2) - ((srcRect.w) / 2) + 60, (SCREEN_HEIGHT / 2) - ((srcRect.h) / 3) - 40,
+	400, 500 };
+
+	imgPauseBG->srcRect = &srcRect;
+	imgPauseBG->render(gRenderer, &SMDstRect);
+
+	SDL_Color black = { 0, 0, 0, 255 };
+
+	SDL_Rect dstRectGameOver ={ 165, 100 , 320, 100 };
+
+	textGameOver->loadFromRenderedText(gRenderer, "PAUSED", black, &dstRectGameOver);
 }
 
 void Game::renderButtonPrmry() {
@@ -1014,6 +1199,7 @@ void Game::restartFlags() {
 	flags->inStart = 0;
 	flags->inGameOver = 0;
 	flags->inSettings = 0;
+	flags->inPause = 0;
 	flags->poopInProgress = 0;
 	flags->poopFinished = 1;
 	flags->FXInProgress = 0;
@@ -1032,6 +1218,8 @@ void Game::restartFlags() {
 	flags->clickedButtonPrmry = 0;
 	flags->clickedButtonLeft = 0;
 	flags->clickedButtonRight = 0;
+	flags->pauseButtonClickFinished = 1;
+	flags->pauseButtonClickInProgress = 0;
 	*prmryBtnOpacity = 255;
 	*rightBtnOpacity = 255;
 	*leftBtnOpacity = 255;
@@ -1049,6 +1237,13 @@ void Game::resetMouseflags() {
 	flags->SMinPlayClick = 0;
 	flags->SMinSettClick = 0;
 	flags->SMinQuitClick = 0;
+	flags->PSOutside = 1;
+	flags->PSResumeInside = 0;
+	flags->PSRestartInside = 0;
+	flags->PSRQuitInside = 0;
+	flags->PSInResumeClick = 0;
+	flags->PSInRestartClick = 0;
+	flags->PSInQuitClick = 0;
 }
 
 void Game::close() {
